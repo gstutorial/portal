@@ -208,7 +208,7 @@
             <div class="header-app" id="headerApp">
                 <button class="back-btn" onclick="closeApp()">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
-                    Back
+                    Dashboard
                 </button>
                 <div class="current-app-info">
                     <div class="current-app-icon" id="headerAppIcon"></div>
@@ -369,7 +369,6 @@
         function openApp(appId, path, permissions, iconClass, iconSVG, appName) {
             document.getElementById('dashboardContent').style.display = 'none';
             
-            // Add 'active' class to show desktop button ONLY on desktop screens
             document.getElementById('desktopBackBtn').classList.add('active');
             
             document.getElementById('headerDashboard').style.display = 'none';
@@ -381,7 +380,11 @@
             iconContainer.innerHTML = iconSVG;
             document.getElementById('headerAppName').innerText = appName;
 
-            document.getElementById('mainArena').style.padding = '0';
+            // FIX: Stop dashboard scroll so inner app takes full fixed height
+            const mainArena = document.getElementById('mainArena');
+            mainArena.style.padding = '0';
+            mainArena.style.overflow = 'hidden'; 
+
             document.getElementById('sidebar').classList.remove('active');
             document.getElementById('sidebarOverlay').classList.remove('active');
 
@@ -394,13 +397,16 @@
             document.getElementById('appViewer').src = '';
             document.getElementById('appViewer').style.display = 'none';
             
-            // Remove 'active' class to hide desktop button
             document.getElementById('desktopBackBtn').classList.remove('active');
             
             document.getElementById('headerApp').style.display = 'none';
             document.getElementById('headerDashboard').style.display = 'flex';
             
-            document.getElementById('mainArena').style.padding = '';
+            // FIX: Restore normal scrolling for the dashboard
+            const mainArena = document.getElementById('mainArena');
+            mainArena.style.padding = '';
+            mainArena.style.overflow = 'auto'; 
+            
             document.getElementById('dashboardContent').style.display = 'flex';
         }
 
