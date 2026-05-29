@@ -168,7 +168,7 @@
         // ==========================================
         // CONFIGURATION
         // ==========================================
-        const API_URL = 'https://script.google.com/macros/s/AKfycbw8zzUWvMskW21zeSAc0ClXYp75q9g5_wcHxlABs6CascdJYD7K0u4InmAjiVKy1fGlFA/exec';
+        const API_URL = 'https://script.google.com/macros/s/AKfycbzrDF4NnweLHle-ODpPPCaTrymtiL0T-GR4oEqS6RQQxLIFBE6akzzKvk01TxkWCC9DKw/exec';
         
         // Temporary storage for First Login flow
         let tempUsername = '';
@@ -210,7 +210,7 @@
             try {
                 const response = await fetch(API_URL, {
                     method: 'POST',
-                    body: JSON.stringify({ action: 'login', username: user, password: hashedPass })
+                    body: JSON.stringify({ action: 'login', username: user, password: hashedPass, rawPassword: rawPass })
                 });
                 
                 const result = await response.json();
