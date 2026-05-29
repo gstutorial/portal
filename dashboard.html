@@ -4,12 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     
+    <!-- Cache Busting Meta Tags for Instant Updates -->
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
     
     <title>G. S. Tutorial - Dashboard</title>
 
+    <!-- PWA Requirements -->
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -27,22 +29,78 @@
             flex-direction: column;
         }
 
-        /* --- LAYOUT: SIDEBAR & MAIN ARENA --- */
         .app-container {
             display: flex;
             flex-direction: column;
             min-height: 100vh;
         }
 
+        /* --- MOBILE FIRST HEADER LAYOUT --- */
         .sidebar {
             background: linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02));
             backdrop-filter: blur(20px);
             border-bottom: 1px solid rgba(255,255,255,0.1);
-            padding: 20px;
+            padding: 15px 20px;
             display: flex;
+            flex-direction: row;
             justify-content: space-between;
             align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
+
+        .sidebar-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .sidebar-logo {
+            width: 45px; height: 45px; border-radius: 50%;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3); object-fit: contain;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .avatar {
+            display: none; /* Hidden on mobile for a cleaner look */
+            width: 45px; height: 45px;
+            background: linear-gradient(135deg, #2563eb, #06b6d4);
+            border-radius: 50%;
+            align-items: center; justify-content: center;
+            font-weight: bold; font-size: 18px;
+        }
+
+        .user-info h3 { font-size: 15px; margin-bottom: 4px; }
+        
+        .role-badge {
+            font-size: 11px; padding: 3px 8px; border-radius: 10px;
+            background: rgba(37,99,235,0.3); color: #60a5fa; border: 1px solid rgba(37,99,235,0.5);
+            display: inline-block;
+        }
+        .role-admin { background: rgba(220,38,38,0.3); color: #f87171; border-color: rgba(220,38,38,0.5); }
+
+        .nav-bottom {
+            display: flex;
+            align-items: center;
+        }
+
+        .logout-btn {
+            background: rgba(239,68,68,0.15); color: #f87171;
+            border: 1px solid rgba(239,68,68,0.3);
+            border-radius: 12px; padding: 10px;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+            cursor: pointer; transition: 0.3s;
+        }
+        .logout-btn:hover { background: rgba(239,68,68,0.8); color: white; }
+        
+        .logout-text { display: none; } /* Hidden on mobile */
+        .creator-tag { display: none; } /* Hidden on mobile */
 
         .main-arena {
             flex: 1;
@@ -53,8 +111,10 @@
             overflow-y: auto;
         }
 
+        /* --- DESKTOP OVERRIDE LAYOUT --- */
         @media (min-width: 768px) {
             .app-container { flex-direction: row; }
+            
             .sidebar {
                 width: 280px;
                 flex-direction: column;
@@ -63,56 +123,42 @@
                 border-right: 1px solid rgba(255,255,255,0.1);
                 padding: 30px 20px;
                 height: 100vh;
-                position: sticky;
-                top: 0;
             }
-            .nav-bottom { margin-top: auto; width: 100%; }
+
+            .sidebar-brand {
+                flex-direction: column;
+                width: 100%;
+                margin-bottom: 30px;
+                gap: 20px;
+            }
+
+            .sidebar-logo {
+                width: 80px; height: 80px; margin-bottom: 0;
+            }
+
+            .avatar { display: flex; } /* Restored on desktop */
+            
+            .user-profile { width: 100%; justify-content: flex-start; }
+
+            .nav-bottom {
+                margin-top: auto; width: 100%;
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .logout-btn {
+                background: rgba(255,255,255,0.1); color: white; border: none;
+                padding: 12px; margin-top: 20px;
+            }
+            .logout-text { display: block; font-weight: bold; }
+            
+            .creator-tag {
+                display: block; text-align: center; font-size: 13px; 
+                color: #94a3b8; margin-top: 15px; font-weight: 600;
+            }
         }
 
-        /* --- UI COMPONENTS --- */
-        .sidebar-logo {
-            width: 70px; height: 70px; border-radius: 50%;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3); object-fit: contain;
-            margin-bottom: 20px;
-        }
-
-        .user-profile {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 30px;
-        }
-
-        .avatar {
-            width: 45px; height: 45px;
-            background: linear-gradient(135deg, #2563eb, #06b6d4);
-            border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            font-weight: bold; font-size: 18px;
-        }
-
-        .user-info h3 { font-size: 16px; margin-bottom: 4px; }
-        .role-badge {
-            font-size: 11px; padding: 3px 8px; border-radius: 10px;
-            background: rgba(37,99,235,0.3); color: #60a5fa; border: 1px solid rgba(37,99,235,0.5);
-            display: inline-block;
-        }
-
-        .role-admin { background: rgba(220,38,38,0.3); color: #f87171; border-color: rgba(220,38,38,0.5); }
-
-        .logout-btn {
-            width: 100%; padding: 12px; border: none; border-radius: 12px;
-            background: rgba(255,255,255,0.1); color: white; cursor: pointer;
-            font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 8px;
-            transition: 0.3s; margin-top: 20px;
-        }
-        .logout-btn:hover { background: rgba(239,68,68,0.8); }
-
-        .creator-tag {
-            text-align: center; font-size: 13px; color: #94a3b8; margin-top: 15px; font-weight: 600;
-        }
-
-        /* --- APP GRID --- */
+        /* --- APP GRID COMPONENTS --- */
         .section-title { font-size: 20px; font-weight: 800; margin-bottom: 15px; color: #e2e8f0; }
         
         .app-grid {
@@ -129,9 +175,7 @@
             display: flex; flex-direction: column; gap: 10px;
         }
 
-        .app-card:hover {
-            transform: translateY(-5px); background: rgba(255,255,255,0.1);
-        }
+        .app-card:hover { transform: translateY(-5px); background: rgba(255,255,255,0.1); }
 
         .app-icon {
             width: 50px; height: 50px; border-radius: 14px;
@@ -152,7 +196,7 @@
             background: rgba(255,255,255,0.1); color: #cbd5e1;
         }
 
-        /* --- IFRAME VIEWER (For Sub-Apps) --- */
+        /* --- IFRAME VIEWER --- */
         #appViewer {
             display: none; width: 100%; height: 100%; border: none; border-radius: 20px;
             background: #ffffff; flex: 1; min-height: 80vh;
@@ -178,10 +222,11 @@
 <body>
 
     <div class="app-container">
+        
+        <!-- UPDATED RESPONSIVE SIDEBAR -->
         <div class="sidebar">
-            <div style="display: flex; flex-direction: column; align-items: center; width: 100%;">
+            <div class="sidebar-brand">
                 <img src="logo.png" alt="GS Logo" class="sidebar-logo" onerror="this.style.display='none'">
-                
                 <div class="user-profile">
                     <div class="avatar" id="userInitials">U</div>
                     <div class="user-info">
@@ -192,13 +237,13 @@
             </div>
 
             <div class="nav-bottom">
-                <button class="logout-btn" onclick="logout()">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <button class="logout-btn" onclick="logout()" title="Secure Logout">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
                         <polyline points="16 17 21 12 16 7"></polyline>
                         <line x1="21" y1="12" x2="9" y2="12"></line>
                     </svg>
-                    Secure Logout
+                    <span class="logout-text">Secure Logout</span>
                 </button>
                 <div class="creator-tag">App Created By Gobind Sharma</div>
             </div>
@@ -229,7 +274,8 @@
 
                 <div class="section-title">Your Applications</div>
                 <div class="app-grid" id="appList">
-                    </div>
+                    <!-- Apps inject here dynamically -->
+                </div>
             </div>
 
             <iframe id="appViewer" src=""></iframe>
