@@ -161,7 +161,7 @@
             <div class="modal-title" id="modalTitle">Add New User</div>
             
             <div class="form-group">
-                <label>Username</label>
+                <label>Username (or Mobile No.)</label>
                 <input type="text" id="m_username" class="form-control" placeholder="e.g., student_01">
             </div>
 
@@ -169,6 +169,7 @@
                 <label>System Role</label>
                 <select id="m_role" class="form-control" onchange="togglePermissionsUI()">
                     <option value="User">Standard User (Restricted)</option>
+                    <option value="Student">Student (App-Specific)</option>
                     <option value="Admin">Administrator (Full Access)</option>
                 </select>
             </div>
@@ -243,11 +244,18 @@
                     method: 'POST', body: JSON.stringify({ action: 'get_users', adminUsername: adminUsername, adminToken: adminToken })
                 });
                 const result = await response.json();
+                
                 if (result.status === 'success') {
                     grid.innerHTML = ''; 
                     result.users.forEach(user => grid.appendChild(createUserCard(user)));
-                } else { grid.innerHTML = `<div style="color:#ef4444;">Error: ${result.message}</div>`; }
-            } catch (error) { grid.innerHTML = '<div style="color:#ef4444;">Network Error. Check connection.</div>'; }
+                } else { 
+                    grid.innerHTML = `<div style="color:#ef4444;">Error: ${result.message}</div>`; 
+                }
+            } catch (error) { 
+                // Enhanced error logging to show the real error, not just a fake network issue
+                console.error("User rendering/fetching error:", error);
+                grid.innerHTML = `<div style="color:#ef4444; padding: 15px; border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 12px;">UI Error: ${error.message}</div>`; 
+            }
         }
 
         function createUserCard(user) {
@@ -261,16 +269,20 @@
             if (user.status === 'First_Login') { statusClass = 'badge-firstlogin'; statusText = 'Pending Setup'; }
             if (user.status === 'Suspended') { statusClass = 'badge-suspended'; }
             
-            const avatarLetter = user.username.charAt(0).toUpperCase();
+            // BUG FIX: Strictly enforce username as a String to prevent .charAt() crash on mobile numbers
+            const safeUsername = String(user.username);
+            const avatarLetter = safeUsername.charAt(0).toUpperCase();
             
             let appsHtml = '';
             if (user.role === 'Admin') {
                 appsHtml = `<div class="app-item"><span class="app-name">All Applications</span><span class="app-perms">Full Control</span></div>`;
-            } else if (Object.keys(user.access).length === 0) {
+            } else if (!user.access || Object.keys(user.access).length === 0) {
                 appsHtml = `<div class="app-item" style="color:#94a3b8; background: transparent;">No Apps Assigned</div>`;
             } else {
                 for (const [appName, perms] of Object.entries(user.access)) {
-                    appsHtml += `<div class="app-item"><span class="app-name">${appName.replace('-', ' ').toUpperCase()}</span><span class="app-perms">${perms.join(', ')}</span></div>`;
+                    // Safe guard array joining
+                    const permsText = Array.isArray(perms) ? perms.join(', ') : 'View';
+                    appsHtml += `<div class="app-item"><span class="app-name">${appName.replace('-', ' ').toUpperCase()}</span><span class="app-perms">${permsText}</span></div>`;
                 }
             }
 
@@ -281,7 +293,7 @@
                     <div class="header-left">
                         <div class="avatar">${avatarLetter}</div>
                         <div class="user-meta">
-                            <div class="username">${user.username}</div>
+                            <div class="username">${safeUsername}</div>
                             <div class="badge-group">
                                 <span class="badge ${badgeClass}">${user.role}</span>
                                 <span class="badge ${statusClass}">${statusText}</span>
@@ -333,26 +345,37 @@
                 document.getElementById('m_password_label').innerText = "Temporary Password";
                 document.getElementById('m_password').value = 'Welcome123';
                 document.getElementById('m_password').placeholder = "";
+                document.getElementById('m_username').disabled = false;
             } else {
-                editOldUsername = userData.username; 
+                editOldUsername = String(userData.username); 
                 document.getElementById('modalTitle').innerText = "Edit User";
                 document.getElementById('m_status_group').style.display = 'block';
                 
-                document.getElementById('btnDeleteUser').style.display = userData.username === adminUsername ? 'none' : 'block';
+                document.getElementById('btnDeleteUser').style.display = String(userData.username) === String(adminUsername) ? 'none' : 'block';
 
                 document.getElementById('m_password_label').innerText = "Reset Password (Optional)";
                 document.getElementById('m_password').placeholder = "Leave blank to keep current password";
                 
                 document.getElementById('m_username').value = userData.username;
+                
+                // Prevent editing student usernames because it breaks the link with the Tuition Manager DB
+                if (userData.role === 'Student') {
+                    document.getElementById('m_username').disabled = true;
+                } else {
+                    document.getElementById('m_username').disabled = false;
+                }
+
                 document.getElementById('m_role').value = userData.role;
                 document.getElementById('m_status').value = userData.status === 'Suspended' ? 'Suspended' : 'Active';
                 
                 if (userData.access && userData.role !== 'Admin') {
                     Object.keys(userData.access).forEach(app => {
-                        userData.access[app].forEach(perm => {
-                            const cb = document.querySelector(`.perm-cb[data-app="${app}"][value="${perm}"]`);
-                            if (cb) cb.checked = true;
-                        });
+                        if(Array.isArray(userData.access[app])){
+                            userData.access[app].forEach(perm => {
+                                const cb = document.querySelector(`.perm-cb[data-app="${app}"][value="${perm}"]`);
+                                if (cb) cb.checked = true;
+                            });
+                        }
                     });
                 }
             }
@@ -372,7 +395,7 @@
             if (!newUsername) return showToast("Username is required", "error");
 
             let accessObj = {};
-            if (role === 'User') {
+            if (role !== 'Admin') {
                 document.querySelectorAll('.perm-cb:checked').forEach(cb => {
                     const app = cb.getAttribute('data-app');
                     if (!accessObj[app]) accessObj[app] = [];
@@ -399,7 +422,7 @@
                     showToast(result.message, "success");
                     closeModal(); loadUsers();
                 } else { showToast(result.message, "error"); }
-            } catch (error) { showToast("Network Error", "error"); }
+            } catch (error) { showToast("Network Error during save", "error"); }
             
             saveBtn.disabled = false; saveBtn.innerText = "Save User";
         }
