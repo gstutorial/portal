@@ -39,7 +39,7 @@ body {
         /* --- MAIN VIEW AREA --- */
         .view-container {
     width: 100%;
-    height: calc(100vh - 78px);
+    height: calc(100dvh - 78px);
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
     padding: 15px;
@@ -588,7 +588,34 @@ window.addEventListener('message', (event) => {
     }
 });
 
-window.onload = () => fetchStudents();
+function forcePWALayoutRefresh() {
+    const nav = document.querySelector('.app-nav');
+    const container = document.querySelector('.view-container');
+
+    if (!nav || !container) return;
+
+    const navHeight = nav.offsetHeight;
+
+    container.style.height = `calc(100dvh - ${navHeight}px)`;
+
+    nav.style.display = 'none';
+
+    requestAnimationFrame(() => {
+        nav.style.display = 'flex';
+    });
+}
+
+window.onload = () => {
+    fetchStudents();
+
+    setTimeout(forcePWALayoutRefresh, 100);
+    setTimeout(forcePWALayoutRefresh, 500);
+    setTimeout(forcePWALayoutRefresh, 1000);
+};
+
+window.addEventListener('focus', forcePWALayoutRefresh);
+window.addEventListener('resize', forcePWALayoutRefresh);
+window.addEventListener('orientationchange', forcePWALayoutRefresh);
     </script>
 </body>
 </html>
