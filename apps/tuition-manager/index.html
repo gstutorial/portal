@@ -110,7 +110,13 @@ body {
         .icon-call { color: #38bdf8; }
 
         /* --- BROWSER-STYLE PROFILE TABS --- */
-        .profile-header { display: flex; align-items: center; gap: 15px; padding-bottom: 15px; margin-bottom: 15px; }
+        .profile-header {
+    display:flex;
+    align-items:center;
+    gap:15px;
+    padding-bottom:10px;
+    margin-bottom:10px;
+}
         .p-avatar { width: 70px; height: 70px; border-radius: 50%; overflow: hidden; border: 2px solid rgba(255,255,255,0.2); flex-shrink: 0;}
         .p-avatar img, .p-avatar svg { width: 100%; height: 100%; object-fit: cover; }
         .p-info h2 { font-size: 22px; font-weight: 800; margin-bottom: 4px; }
@@ -157,15 +163,31 @@ body {
             background: rgba(0,0,0,0.8); backdrop-filter: blur(5px); display: none; 
             justify-content: center; align-items: center; z-index: 1000; padding: 10px; 
         }
-        .modal { 
-            background: #0f172a; width: 100%; max-width: 450px; border-radius: 16px; 
-            padding: 15px; /* Extremely tight padding */
-            max-height: 95vh; 
-            overflow-y: auto; 
-            border: 1px solid rgba(255,255,255,0.15); 
-        }
-        .profile-upload-container { display: flex; flex-direction: column; align-items: center; gap: 4px; margin-bottom: 8px; }
-        .profile-preview { width: 55px; height: 55px; /* Much smaller circle */ border-radius: 50%; background: rgba(0,0,0,0.3); border: 2px dashed rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; overflow: hidden; cursor: pointer; transition: 0.3s; }
+        .modal {
+    background: #0f172a;
+    width: 95%;
+    max-width: 650px;
+    border-radius: 20px;
+    padding: 20px;
+    max-height: 90vh;
+    overflow-y: auto;
+    border: 1px solid rgba(255,255,255,0.15);
+    box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+}
+        @media (max-width: 768px) {
+    .modal {
+        width: calc(100% - 20px);
+        padding: 16px;
+        max-height: 88vh;
+    }
+
+    .form-row {
+        flex-direction: column;
+        gap: 6px;
+    }
+}
+        .profile-upload-container { display: flex; flex-direction: column; align-items: center; gap: 4px; margin-bottom: 15px; }
+        .profile-preview { width: 90px; height: 90px; /* Much smaller circle */ border-radius: 50%; background: rgba(0,0,0,0.3); border: 2px dashed rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; overflow: hidden; cursor: pointer; transition: 0.3s; }
         .profile-preview:hover { border-color: #38bdf8; background: rgba(56, 189, 248, 0.1); }
         .profile-preview img { width: 100%; height: 100%; object-fit: cover; }
         .profile-preview svg { width: 22px; height: 22px; color: #94a3b8; }
@@ -603,7 +625,9 @@ function forcePWALayoutRefresh() {
 
     const navHeight = nav.offsetHeight;
 
-    container.style.height = `calc(100dvh - ${navHeight}px)`;
+    container.style.top = '0';
+container.style.bottom = navHeight + 'px';
+container.style.height = 'auto';
 
     nav.style.display = 'none';
 
