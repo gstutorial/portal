@@ -146,7 +146,14 @@
         .perm-tag { font-size: 10px; padding: 4px 8px; border-radius: 6px; font-weight: bold; background: rgba(255,255,255,0.1); color: #cbd5e1; }
 
         /* IFRAME VIEWER */
-        #appViewer { display: none; width: 100%; height: 100%; border: none; background: transparent; flex: 1; }
+        #appViewer {
+    display: none;
+    width: 100%;
+    height: calc(100dvh - 60px);
+    border: none;
+    background: transparent;
+    flex: none;
+}
         #dashboardContent { flex: 1; display: flex; flex-direction: column; gap: 25px; }
 
         /* --- DESKTOP BACK BUTTON (Strictly Hidden on Mobile) --- */
@@ -398,9 +405,28 @@
     } catch (e) {}
 };
 
+viewer.style.height =
+    (window.innerHeight -
+     document.querySelector('.mobile-header').offsetHeight) + 'px';
+
 viewer.src = `${path}?perms=${encodeURIComponent(JSON.stringify(permissions))}`;
 viewer.style.display = 'block';
         }
+        window.addEventListener('resize', () => {
+    const viewer = document.getElementById('appViewer');
+
+    if (viewer.style.display === 'block') {
+        viewer.style.height =
+            (window.innerHeight -
+             document.querySelector('.mobile-header').offsetHeight) + 'px';
+
+        try {
+            viewer.contentWindow.postMessage({
+                action: 'fixBottomNav'
+            }, '*');
+        } catch(e){}
+    }
+});
 
         function closeApp() {
             document.getElementById('appViewer').src = '';
