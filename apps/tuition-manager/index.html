@@ -13,7 +13,9 @@
         
         body { 
             background: transparent; color: white; margin: 0;
-            display: flex; flex-direction: column; height: 100vh; overflow: hidden;
+            display: flex; flex-direction: column; 
+            height: 100vh; height: 100dvh; /* FIX: Added 100dvh to lock to dynamic mobile viewports */
+            overflow: hidden;
         }
 
         /* --- BULLETPROOF FIXED BOTTOM NAV --- */
@@ -128,7 +130,6 @@
         .custom-dialog h3 { font-size: 20px; font-weight: bold; margin-bottom: 8px; color: white; }
         .custom-dialog p { font-size: 14px; color: #94a3b8; margin-bottom: 25px; line-height: 1.4; }
         
-        /* The solid blue full-width OK button from your screenshot */
         .dialog-actions .btn-primary { background: #3b82f6; width: 100%; padding: 12px; border-radius: 10px; font-size: 15px; }
         .dialog-actions .btn-danger { background: #ef4444; color: white; width: 100%; padding: 12px; border-radius: 10px; }
         .dialog-actions { display: flex; gap: 10px; width: 100%; justify-content: center; }
@@ -164,7 +165,7 @@
             </div>
 
             <div class="form-group" id="searchBarGroup">
-                <input type="text" class="form-control" placeholder="Search by name, phone, or class..." oninput="searchStudents(this.value)">
+                <input type="text" id="searchInput" class="form-control" placeholder="Search by name, phone, or class..." oninput="searchStudents()">
             </div>
             
             <div id="studentListContainer"></div>
@@ -291,6 +292,11 @@
             <div class="form-group"><label>School Name</label><input type="text" id="stuSchool" class="form-control" placeholder="School Name"></div>
             <div class="form-group"><label>Home Address</label><input type="text" id="stuAddress" class="form-control" placeholder="Full Address"></div>
 
+            <div class="form-group" id="statusGroup" style="display: none;">
+                <label>Enrollment Status</label>
+                <select id="stuStatus" class="form-control"><option value="Active">Active Student</option><option value="Inactive">Inactive / Left</option></select>
+            </div>
+
             <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 25px;">
                 <button class="btn" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);" onclick="closeStudentModal()">Cancel</button>
                 <button class="btn btn-success" id="saveStudentBtn" onclick="saveStudent()">Save Student</button>
@@ -402,6 +408,7 @@
                         if(students.length > 0) openStudentProfile(students[0].id);
                     } else {
                         document.getElementById('adminDeleteBtn').style.display = 'block';
+                        // Initial render
                         renderStudents(); 
                     }
                 } else { container.innerHTML = `<div style="text-align:center; color: #ef4444;">Error: ${result.message}</div>`; }
@@ -423,13 +430,20 @@
             switchProfileTab('overview'); switchTab('profile');
         }
 
-        function renderStudents(searchQuery = "") {
+        // FIX: The render function now dynamically pulls the current search box value
+        function renderStudents() {
             const container = document.getElementById('studentListContainer');
             container.innerHTML = "";
+            
+            // Grab the current value directly from the input box (defaulting to empty string)
+            const searchInputEl = document.getElementById('searchInput');
+            const searchQuery = searchInputEl ? searchInputEl.value.toLowerCase() : "";
 
             const filtered = students.filter(s => {
                 const matchesStatus = s.status === currentFilter;
-                const matchesSearch = s.name.toLowerCase().includes(searchQuery.toLowerCase()) || s.class.toLowerCase().includes(searchQuery.toLowerCase()) || s.mobile.includes(searchQuery);
+                const matchesSearch = s.name.toLowerCase().includes(searchQuery) || 
+                                      s.class.toLowerCase().includes(searchQuery) || 
+                                      s.mobile.includes(searchQuery);
                 return matchesStatus && matchesSearch;
             });
 
@@ -490,7 +504,10 @@
             renderStudents();
         }
 
-        function searchStudents(query) { renderStudents(query); }
+        // FIX: searchStudents simply triggers renderStudents, which now independently grabs the input value
+        function searchStudents() { 
+            renderStudents(); 
+        }
 
         function initCrop(event) {
             const file = event.target.files[0]; if (!file) return;
@@ -516,6 +533,7 @@
 
         function openStudentModal() {
             document.getElementById('modalTitle').innerText = "Add New Student";
+            document.getElementById('statusGroup').style.display = 'none';
             ['stuName','stuClass','stuFee','stuJoinDate','stuMobile','stuSchool','stuAddress'].forEach(id => document.getElementById(id).value = '');
             document.getElementById('stuGender').value = 'Male';
             document.getElementById('photoPreview').src = ''; document.getElementById('photoPreview').style.display = 'none';
