@@ -21,13 +21,11 @@ body {
     background: transparent;
     color: white;
     overflow: hidden;
-    position: fixed;
-    inset: 0;
 }
 
         /* --- BULLETPROOF FIXED BOTTOM NAV --- */
         .app-nav {
-            position: fixed; bottom: 0; left: 0; right: 0;
+           position: absolute; bottom: 0; left: 0; right: 0;
             display: flex; justify-content: space-around; background: rgba(15, 23, 42, 0.98);
             backdrop-filter: blur(10px); border-top: 1px solid rgba(255,255,255,0.05); 
             padding: 10px 10px calc(10px + env(safe-area-inset-bottom));
@@ -40,17 +38,14 @@ body {
 
         /* --- MAIN VIEW AREA --- */
         .view-container {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 78px;
-            overflow-y: auto;
-            -webkit-overflow-scrolling: touch;
-            padding: 15px;
-            padding-bottom: 20px;
-            overscroll-behavior: contain;
-        }
+    width: 100%;
+    height: calc(100vh - 78px);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 15px;
+    padding-bottom: 20px;
+    overscroll-behavior: contain;
+}
         
         .view-section { display: none; animation: fadeIn 0.3s ease; }
         .view-section.active { display: block; }
