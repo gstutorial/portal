@@ -319,6 +319,7 @@ let pendingRole = '';
             try {
                 const response = await fetch(API_URL, {
     method: 'POST',
+    redirect: 'follow', // THIS IS THE FIX THAT WAS MISSING
     headers: {
         'Content-Type': 'text/plain;charset=utf-8'
     },
