@@ -336,7 +336,24 @@ alert("SERVER RESPONSE:\n\n" + text);
 
 console.log("SERVER RESPONSE:", text);
 
-const result = JSON.parse(text);
+let result;
+
+try {
+
+    result = JSON.parse(text);
+
+} catch (e) {
+
+    console.error("JSON ERROR:", text);
+
+    alert(
+        "INVALID JSON RESPONSE:\n\n" +
+        text
+    );
+
+    throw e;
+
+}
 
                 if (result.status === 'success') {
 
@@ -381,8 +398,19 @@ else {
 
 }
             } catch (error) {
-                showToast("Network Error. Please try again.");
-            }
+
+    console.error("LOGIN ERROR:", error);
+
+    alert(
+        "ERROR:\n" +
+        error.name + "\n\n" +
+        error.message
+    );
+
+    showToast(
+        "Network Error. Please try again."
+    );
+}
             
             toggleLoading('loginBtn', 'loginSpinner', false);
         }
