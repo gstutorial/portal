@@ -147,16 +147,16 @@
 
         /* IFRAME VIEWER */
         #appViewer {
-    display: none;
-    width: 100%;
-    height: calc(100dvh - 60px);
-    border: none;
-    background: transparent;
-    flex: none;
-}
+            display: none;
+            width: 100%;
+            height: calc(100dvh - 60px);
+            border: none;
+            background: transparent;
+            flex: none;
+        }
         #dashboardContent { flex: 1; display: flex; flex-direction: column; gap: 25px; }
 
-        /* --- DESKTOP BACK BUTTON (Strictly Hidden on Mobile) --- */
+        /* --- DESKTOP BACK BUTTON --- */
         .desktop-back-nav { display: none !important; }
 
         /* =========================================
@@ -182,7 +182,6 @@
             .app-card { flex-direction: column; gap: 12px; padding: 25px; }
             .app-icon { width: 60px; height: 60px; }
             
-            /* Native Desktop Back Button shown ONLY when active class is added */
             .desktop-back-nav.active { 
                 display: flex !important; align-items: center; gap: 10px; cursor: pointer; 
                 font-size: 18px; font-weight: bold; color: #38bdf8; margin-bottom: 10px; 
@@ -283,7 +282,7 @@
         </div>
     </div>
 
-    <button id="installAppBtn" class="install-fab">ðŸ“² Install App</button>
+    <button id="installAppBtn" class="install-fab">📲 Install App</button>
 
     <script src="config.js"></script>
 
@@ -296,7 +295,6 @@
         installBtn.addEventListener('click', async () => { installBtn.style.display = 'none'; deferredPrompt.prompt(); deferredPrompt = null; });
 
         const API_URL = GS_CONFIG.API_URL;
-        const HEARTBEAT_INTERVAL = 5 * 60 * 1000; 
 
         const APP_DIRECTORY = {
             "tuition-manager": {
@@ -314,12 +312,43 @@
         window.onload = () => {
             const token = localStorage.getItem('gs_token');
             const username = localStorage.getItem('gs_username');
+            const role = localStorage.getItem('gs_role') || 'User';
+            
             if (!token || !username) return window.location.href = 'index.html';
             
             renderSidebar(username);
             buildDashboard();
-            startHeartbeat();
+            
+            // Initiate silent background fetch for instant app loading
+            prefetchAppData(username, token, role);
         };
+
+        // ==========================================
+        // PREFETCH ENGINE (INSTANT LOAD)
+        // ==========================================
+        function prefetchAppData(username, token, role) {
+            // Prefetch Students
+            fetch(API_URL, {
+                method: 'POST',
+                body: JSON.stringify({ action: 'get_students', username: username, token: token })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === 'success') sessionStorage.setItem('gs_pref_students', JSON.stringify(data.students));
+            }).catch(e => console.error("Prefetch error"));
+
+            // Prefetch Users (Only Admins need this)
+            if (role === 'Admin') {
+                fetch(API_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({ action: 'get_users', adminUsername: username, adminToken: token })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.status === 'success') sessionStorage.setItem('gs_pref_users', JSON.stringify(data.users));
+                }).catch(e => console.error("Prefetch error"));
+            }
+        }
 
         function toggleSidebar() {
             document.getElementById('sidebar').classList.toggle('active');
@@ -398,37 +427,23 @@
 
             const viewer = document.getElementById('appViewer');
             viewer.onload = () => {
-    try {
-        viewer.contentWindow.postMessage({
-            action: 'fixBottomNav'
-        }, '*');
-    } catch (e) {}
-};
+                try { viewer.contentWindow.postMessage({ action: 'fixBottomNav' }, '*'); } catch (e) {}
+            };
 
-viewer.style.height =
-    (window.innerHeight -
-     document.querySelector('.mobile-header').offsetHeight) + 'px';
-
-viewer.src = `${path}?perms=${encodeURIComponent(JSON.stringify(permissions))}`;
-viewer.style.display = 'block';
+            viewer.style.height = (window.innerHeight - document.querySelector('.mobile-header').offsetHeight) + 'px';
+            viewer.src = `${path}?perms=${encodeURIComponent(JSON.stringify(permissions))}`;
+            viewer.style.display = 'block';
         }
+
         window.addEventListener('resize', () => {
-    const viewer = document.getElementById('appViewer');
+            const viewer = document.getElementById('appViewer');
+            if (viewer.style.display === 'block') {
+                viewer.style.height = (window.innerHeight - document.querySelector('.mobile-header').offsetHeight) + 'px';
+                try { viewer.contentWindow.postMessage({ action: 'fixBottomNav' }, '*'); } catch(e){}
+            }
+        });
 
-    if (viewer.style.display === 'block') {
-        viewer.style.height =
-            (window.innerHeight -
-             document.querySelector('.mobile-header').offsetHeight) + 'px';
-
-        try {
-            viewer.contentWindow.postMessage({
-                action: 'fixBottomNav'
-            }, '*');
-        } catch(e){}
-    }
-});
-
-        function closeApp() {
+       function closeApp() {
             document.getElementById('appViewer').src = '';
             document.getElementById('appViewer').style.display = 'none';
             
@@ -437,26 +452,33 @@ viewer.style.display = 'block';
             document.getElementById('headerApp').style.display = 'none';
             document.getElementById('headerDashboard').style.display = 'flex';
             
-            // RESTORE SCROLL: Give dashboard back its normal layout
+            // RESTORE SCROLL
             const mainArena = document.getElementById('mainArena');
             mainArena.style.padding = '15px';
             mainArena.style.gap = '20px';
             mainArena.style.overflow = 'auto'; 
             
             document.getElementById('dashboardContent').style.display = 'flex';
+
+            // NEW: Silent Focus Refresh
+            // Automatically grab fresh data every time they return to the dashboard
+            const username = localStorage.getItem('gs_username');
+            const token = localStorage.getItem('gs_token');
+            const role = localStorage.getItem('gs_role');
+            prefetchAppData(username, token, role);
         }
 
-        function startHeartbeat() {
-            setInterval(async () => {
-                const user = localStorage.getItem('gs_username');
+        // NEW: Cross-Window Event Listener
+        // Listens for a signal from the iframe apps to refresh the cache instantly
+        window.addEventListener('message', (event) => {
+            if (event.data && event.data.action === 'refreshCache') {
+                console.log("Background cache refresh triggered by app...");
+                const username = localStorage.getItem('gs_username');
                 const token = localStorage.getItem('gs_token');
-                try {
-                    const response = await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'heartbeat', username: user, token: token }) });
-                    const result = await response.json();
-                    if (result.status === 'expired') { alert("Session expired."); logout(); }
-                } catch (error) {}
-            }, HEARTBEAT_INTERVAL);
-        }
+                const role = localStorage.getItem('gs_role');
+                prefetchAppData(username, token, role);
+            }
+        });
 
         function logout() { localStorage.clear(); window.location.href = 'index.html'; }
     </script>
