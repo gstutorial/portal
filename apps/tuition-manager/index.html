@@ -11,85 +11,47 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
         
-        /* FIX 1: Use 100% instead of position fixed to stop the mobile iframe rendering bug */
-        html,
-body {
-    width: 100%;
-    height: 100%;
-    margin: 0;
-    padding: 0;
-    background: transparent;
-    color: white;
-    overflow: hidden;
-}
+        html, body {
+            width: 100%; height: 100%; margin: 0; padding: 0;
+            background: transparent; color: white; overflow: hidden;
+            display: flex; flex-direction: column;
+        }
 
         /* --- BULLETPROOF FIXED BOTTOM NAV --- */
         .app-nav {
-           position: fixed; bottom: 0; left: 0; right: 0;
             display: flex; justify-content: space-around; background: rgba(15, 23, 42, 0.98);
             backdrop-filter: blur(10px); border-top: 1px solid rgba(255,255,255,0.05); 
             padding: 10px 10px calc(10px + env(safe-area-inset-bottom));
-            z-index: 9999;
+            z-index: 9999; flex-shrink: 0;
         }
         .nav-item { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; color: #94a3b8; cursor: pointer; padding: 0 12px; border-radius: 12px; transition: 0.3s; height: 50px; }
         .nav-item svg { width: 22px; height: 22px; }
         .nav-item span { font-size: 10px; font-weight: 700; }
         .nav-item.active { color: #38bdf8; background: rgba(56, 189, 248, 0.1); }
 
+        .view-container { flex: 1; position: relative; overflow: hidden; }
         
-        
-        .view-section { display: none; animation: fadeIn 0.3s ease; }
-        .view-section.active { display: block; }
+        .view-section { display: none; height: 100%; animation: fadeIn 0.3s ease; flex-direction: column; padding: 16px; }
+        .view-section.active { display: flex; }
 
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
         /* --- UI COMPONENTS --- */
-        .header-bar {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 15px;
-}
+        .header-bar { display: flex; align-items: center; gap: 12px; margin-bottom: 15px; flex-shrink: 0; }
+        .header-bar h2 { flex: 1; font-size: 20px; font-weight: 800; }
+        
+        /* STRICT SCROLL LOCK: Keeps search bar fixed, only list scrolls */
+        .fixed-top-area { flex-shrink: 0; display: flex; flex-direction: column; }
+        .scrollable-list-area { flex: 1; overflow-y: auto; padding-bottom: 20px; padding-top: 5px; -webkit-overflow-scrolling: touch; }
+        /* Hide scrollbar for cleaner look */
+        .scrollable-list-area::-webkit-scrollbar { width: 4px; }
+        .scrollable-list-area::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
 
-.header-bar h2 {
-    flex: 1;
-    font-size: 20px;
-    font-weight: 800;
-}
-        .profile-action-buttons{
-    display:flex;
-    gap:8px;
-    margin-bottom:24px;
-    align-items:center;
-}
-.profile-btn{
-    flex:1;
-    height:44px;
-    min-height:44px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    gap:6px;
-    font-size:14px;
-    font-weight:700;
-    border-radius:12px;
-    padding:0 12px;
-}
-
-.back-profile-btn{
-    background:rgba(255,255,255,0.08);
-}
-
-.delete-profile-btn{
-    background:#dc2626;
-    color:white;
-    border:none;
-    box-shadow:0 4px 12px rgba(220,38,38,.35);
-}
-
-.edit-profile-btn{
-    background:#3b82f6;
-}
+        .profile-action-buttons { display:flex; gap:8px; margin-bottom:24px; align-items:center; }
+        .profile-btn { flex:1; height:44px; min-height:44px; display:flex; align-items:center; justify-content:center; gap:6px; font-size:14px; font-weight:700; border-radius:12px; padding:0 12px; }
+        .back-profile-btn { background:rgba(255,255,255,0.08); }
+        .delete-profile-btn { background:#dc2626; color:white; border:none; box-shadow:0 4px 12px rgba(220,38,38,.35); }
+        .edit-profile-btn { background:#3b82f6; }
         
         .btn { border: none; border-radius: 12px; padding: 10px 15px; font-size: 13px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; color: white; transition: 0.2s; }
         .btn:active { transform: scale(0.95); }
@@ -110,41 +72,26 @@ body {
         .class-count { font-size: 11px; font-weight: bold; color: #cbd5e1; background: rgba(0,0,0,0.3); padding: 4px 10px; border-radius: 12px; }
         .toggle-arrow { transition: transform 0.3s ease; color: #94a3b8; display: flex; align-items: center; }
         .class-group.active .toggle-arrow { transform: rotate(180deg); color: #38bdf8; }
-
         .class-content { display: none; padding: 0 12px 15px 12px; border-top: 1px solid rgba(255,255,255,0.05); margin-top: 5px; padding-top: 15px; }
         .class-group.active .class-content { display: block; animation: slideDown 0.3s ease; }
 
         /* --- STUDENT CARDS --- */
         .student-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; }
-        
-        .student-card {
-            background: linear-gradient(135deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02)); 
-            border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 15px;
-            display: flex; flex-direction: row; gap: 15px; align-items: center; cursor: pointer; transition: 0.2s;
-        }
+        .student-card { background: linear-gradient(135deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));  border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 15px; display: flex; flex-direction: row; gap: 15px; align-items: center; cursor: pointer; transition: 0.2s; }
         .s-avatar { width: 55px; height: 55px; border-radius: 50%; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; flex-shrink: 0; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); }
         .s-avatar img, .s-avatar svg { width: 100%; height: 100%; object-fit: cover; }
-        
         .s-info { flex: 1; min-width: 0; display: flex; flex-direction: column; justify-content: center; }
         .s-name { font-size: 16px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 4px; color: white; }
         .s-details { font-size: 11px; color: #94a3b8; margin-bottom: 8px; font-weight: 600; }
-        
         .s-fee-badge { font-size: 9px; padding: 4px 6px; border-radius: 6px; font-weight: 800; display: inline-block; width: fit-content; background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
         .s-fee-due { background: rgba(239, 68, 68, 0.15); color: #f87171; border-color: rgba(239, 68, 68, 0.3); }
-
         .s-actions { display: flex; flex-direction: column; gap: 8px; flex-shrink: 0; margin-left: auto; }
         .action-icon { width: 35px; height: 35px; border-radius: 10px; display: flex; align-items: center; justify-content: center; text-decoration: none; color: white; transition: 0.2s; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); }
         .icon-wa { color: #4ade80; }
         .icon-call { color: #38bdf8; }
 
         /* --- BROWSER-STYLE PROFILE TABS --- */
-        .profile-header {
-    display:flex;
-    align-items:center;
-    gap:15px;
-    padding-bottom:10px;
-    margin-bottom:10px;
-}
+        .profile-header { display:flex; align-items:center; gap:15px; padding-bottom:10px; margin-bottom:10px; }
         .p-avatar { width: 70px; height: 70px; border-radius: 50%; overflow: hidden; border: 2px solid rgba(255,255,255,0.2); flex-shrink: 0;}
         .p-avatar img, .p-avatar svg { width: 100%; height: 100%; object-fit: cover; }
         .p-info h2 { font-size: 22px; font-weight: 800; margin-bottom: 4px; }
@@ -164,155 +111,87 @@ body {
         .p-data-label { color: #94a3b8; }
 
         /* --- POPUPS / MODALS --- */
-        .custom-dialog-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); backdrop-filter: blur(8px);
-            display: none; justify-content: center; align-items: center; z-index: 10000; padding: 20px;
-        }
-        .custom-dialog {
-            background: #1e293b; border-radius: 20px; padding: 25px;
-            width: 100%; max-width: 320px; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.6); animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
+        .custom-dialog-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); backdrop-filter: blur(8px); display: none; justify-content: center; align-items: center; z-index: 10000; padding: 20px; }
+        .custom-dialog { background: #1e293b; border-radius: 20px; padding: 25px; width: 100%; max-width: 320px; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.6); animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         @keyframes popIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-        
         .dialog-icon { margin-bottom: 15px; display: inline-flex; padding: 15px; border-radius: 50%; }
         .icon-warning { background: rgba(239, 68, 68, 0.2); color: #ef4444; }
         .icon-success { background: rgba(16, 185, 129, 0.2); color: #10b981; }
-        
         .custom-dialog h3 { font-size: 20px; font-weight: bold; margin-bottom: 8px; color: white; }
         .custom-dialog p { font-size: 14px; color: #94a3b8; margin-bottom: 25px; line-height: 1.4; }
-        
         .dialog-actions .btn-primary { background: #3b82f6; width: 100%; padding: 12px; border-radius: 10px; font-size: 15px; }
         .dialog-actions .btn-danger { background: #ef4444; color: white; width: 100%; padding: 12px; border-radius: 10px; }
         .dialog-actions { display: flex; gap: 10px; width: 100%; justify-content: center; }
 
-        /* FIX 2: AGGRESSIVELY TIGHTENED MODAL TO FIT SMALL SCREENS */
-        .modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0.8);
-    backdrop-filter: blur(5px);
-    display: none;
-    justify-content: center;
-    align-items: flex-start;
-    padding-top: 15px;
-    z-index: 1000;
-}
-        .modal{
-    background:#0f172a;
-    width:calc(100% - 24px);
-    max-width:620px;
-    border-radius:20px;
-    padding:18px;
-    max-height:88vh;
-    overflow-y:auto;
-    border:1px solid rgba(255,255,255,0.15);
-    box-shadow:0 10px 40px rgba(0,0,0,0.4);
-}
-@media (max-width: 768px) {
-
-    .modal {
-        width: calc(100% - 24px);
-        max-width: none;
-        padding: 16px;
-        max-height: calc(100vh - 120px);
-        margin-top: 0;
-        margin-bottom: 90px;
-    }
-
-    .form-row {
-        display: flex;
-        flex-direction: row;
-        gap: 10px;
-    }
-
-    .form-row .form-group {
-        flex: 1;
-    }
-}
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); backdrop-filter: blur(5px); display: none; justify-content: center; align-items: flex-start; padding-top: 15px; z-index: 1000; }
+        .modal { background:#0f172a; width:calc(100% - 24px); max-width:620px; border-radius:20px; padding:18px; max-height:88vh; overflow-y:auto; border:1px solid rgba(255,255,255,0.15); box-shadow:0 10px 40px rgba(0,0,0,0.4); }
+        
+        @media (max-width: 768px) {
+            .modal { width: calc(100% - 24px); max-width: none; padding: 16px; max-height: calc(100vh - 120px); margin-top: 0; margin-bottom: 90px; }
+            .form-row { display: flex; flex-direction: row; gap: 10px; }
+            .form-row .form-group { flex: 1; }
+        }
+        
         .profile-upload-container { display: flex; flex-direction: column; align-items: center; gap: 4px; margin-bottom: 15px; }
-        .profile-preview { width: 90px; height: 90px; /* Much smaller circle */ border-radius: 50%; background: rgba(0,0,0,0.3); border: 2px dashed rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; overflow: hidden; cursor: pointer; transition: 0.3s; }
+        .profile-preview { width: 90px; height: 90px; border-radius: 50%; background: rgba(0,0,0,0.3); border: 2px dashed rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; overflow: hidden; cursor: pointer; transition: 0.3s; }
         .profile-preview:hover { border-color: #38bdf8; background: rgba(56, 189, 248, 0.1); }
         .profile-preview img { width: 100%; height: 100%; object-fit: cover; }
         .profile-preview svg { width: 22px; height: 22px; color: #94a3b8; }
         .upload-text { font-size: 11px; color: #38bdf8; cursor: pointer; font-weight: bold; }
         
-        .form-group { margin-bottom: 6px; /* Smashed margin */ }
+        .form-group { margin-bottom: 6px; }
         .form-group label { display: block; font-size: 11px; color: #cbd5e1; margin-bottom: 2px; font-weight: bold; }
-        .form-control { width: 100%; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.15); color: white; padding: 8px; /* Thinner inputs */ border-radius: 8px; outline: none; font-size: 13px; }
+        .form-control { width: 100%; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.15); color: white; padding: 8px; border-radius: 8px; outline: none; font-size: 13px; }
         .form-row { display: flex; gap: 8px; }
         .cropper-container { max-height: 200px; width: 100%; margin-bottom: 10px; }
     </style>
 </head>
 <body>
-<style>
-.view-container{
-    position:absolute;
-    top:0;
-    left:0;
-    right:0;
-    bottom:78px;
-    overflow-y:auto;
-    padding:16px;
-}
-</style>
     <div class="view-container">
         
         <div id="view-students" class="view-section active">
-            <div class="header-bar">
-                <h2>Directory</h2>
-                <button class="btn btn-primary" id="addStudentBtn" onclick="openStudentModal()">+ Add Student</button>
-            </div>
+            
+            <div class="fixed-top-area">
+                <div class="header-bar">
+                    <h2>Directory</h2>
+                    <button class="btn btn-primary" id="addStudentBtn" onclick="openStudentModal()" style="display: none;">+ Add Student</button>
+                </div>
 
-            <div class="segment-control" id="segmentControl">
-                <div class="segment-btn active" id="tab-active" onclick="filterStudents('Active')">Active Students</div>
-                <div class="segment-btn" id="tab-inactive" onclick="filterStudents('Inactive')">Inactive / Left</div>
-            </div>
+                <div class="segment-control" id="segmentControl" style="display: none;">
+                    <div class="segment-btn active" id="tab-active" onclick="filterStudents('Active')">Active Students</div>
+                    <div class="segment-btn" id="tab-inactive" onclick="filterStudents('Inactive')">Inactive / Left</div>
+                </div>
 
-            <div class="form-group" id="searchBarGroup">
-                <input type="text" id="searchInput" class="form-control" placeholder="🔍 Search by name, phone, or class..." oninput="searchStudents()">
+                <div class="form-group" id="searchBarGroup" style="display: none;">
+                    <input type="text" id="searchInput" class="form-control" placeholder="🔍 Search by name, phone, or class..." oninput="searchStudents()">
+                </div>
             </div>
             
-            <div id="studentListContainer"></div>
+            <div class="scrollable-list-area" id="studentListContainer"></div>
         </div>
 
-        <div id="view-profile" class="view-section">
+        <div id="view-profile" class="view-section" style="overflow-y: auto;">
 
-    <div class="profile-action-buttons">
+            <div class="profile-action-buttons">
+                <button class="btn profile-btn back-profile-btn" onclick="switchTab('students', document.getElementById('navDir'))">← Back</button>
+                
+                <button class="btn profile-btn delete-profile-btn" id="adminDeleteBtn" onclick="deleteStudent()" style="display:none;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                    Delete
+                </button>
 
-        <button class="btn profile-btn back-profile-btn"
-            onclick="switchTab('students', document.getElementById('navDir'))">
-            ← Back
-        </button>
+                <button class="btn profile-btn edit-profile-btn" id="editProfileBtn" onclick="showCustomAlert('Coming Soon', 'Edit Profile logic will be added next.')" style="display:none;">
+                    Edit Profile
+                </button>
+            </div>
 
-        <button class="btn profile-btn delete-profile-btn"
-            id="adminDeleteBtn"
-            onclick="deleteStudent()"
-            style="display:none;">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                <polyline points="3 6 5 6 21 6"></polyline>
-                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-            </svg>
-            Delete
-        </button>
-
-        <button class="btn profile-btn edit-profile-btn"
-            id="editProfileBtn"
-            onclick="showCustomAlert('Coming Soon', 'Edit Profile logic will be added next.')">
-            Edit Profile
-        </button>
-
-    </div>
-
-    <div class="profile-header">
-        <div class="p-avatar" id="profAvatar"></div>
-        <div class="p-info">
-            <h2 id="profName">Student Name</h2>
-            <p id="profId">ID: S-100</p>
-        </div>
-    </div>
+            <div class="profile-header">
+                <div class="p-avatar" id="profAvatar"></div>
+                <div class="p-info">
+                    <h2 id="profName">Student Name</h2>
+                    <p id="profId">ID: S-100</p>
+                </div>
+            </div>
 
             <div class="profile-nav" id="profileNavRow">
                 <div class="p-tab active" onclick="switchProfileTab('overview')" id="tab-overview">Overview</div>
@@ -438,7 +317,10 @@ body {
 
         let students = []; let currentFilter = 'Active'; let currentViewedStudent = null; let cropper; 
         
-        const sessionToken = localStorage.getItem('gs_token'); const sessionUser = localStorage.getItem('gs_username'); const API_URL = GS_CONFIG.API_URL;
+        const sessionToken = localStorage.getItem('gs_token'); 
+        const sessionUser = localStorage.getItem('gs_username'); 
+        const sessionRole = localStorage.getItem('gs_role'); 
+        const API_URL = GS_CONFIG.API_URL;
 
         function showCustomAlert(title, message, type='success') {
             return new Promise((resolve) => {
@@ -496,7 +378,9 @@ body {
 
         function toggleAccordion(headerElement) {
             const group = headerElement.parentElement;
-            if (!group.classList.contains('active')) document.querySelectorAll('.class-group').forEach(g => g.classList.remove('active'));
+            if (!group.classList.contains('active')) {
+                document.querySelectorAll('.class-group').forEach(g => g.classList.remove('active'));
+            }
             group.classList.toggle('active');
         }
 
@@ -509,9 +393,44 @@ body {
             return `${startDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })} to ${endDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}`;
         }
 
-        async function fetchStudents() {
+        // ==========================================
+        // INSTANT LOAD CACHE + BACKGROUND REFRESH
+        // ==========================================
+        async function fetchStudents(forceNetwork = false) {
             const container = document.getElementById('studentListContainer');
-            container.innerHTML = '<div style="text-align:center; padding: 40px; color: #94a3b8;">Loading database...</div>';
+            
+            // Apply UI Security Rules Instantly
+            if (sessionRole === 'Student') {
+                const addBtn = document.getElementById('addStudentBtn');
+                const editBtn = document.getElementById('editProfileBtn');
+                if (addBtn) addBtn.remove();
+                if (editBtn) editBtn.remove();
+                document.getElementById('segmentControl').style.display = 'none';
+                document.getElementById('searchBarGroup').style.display = 'none';
+                document.getElementById('navDirText').innerText = 'My Profile';
+            } else {
+                document.getElementById('addStudentBtn').style.display = 'flex';
+                document.getElementById('segmentControl').style.display = 'flex';
+                document.getElementById('searchBarGroup').style.display = 'block';
+                document.getElementById('adminDeleteBtn').style.display = 'block';
+                document.getElementById('editProfileBtn').style.display = 'flex';
+            }
+
+            // 1. Instant Load from Cache
+            if (!forceNetwork) {
+                const cached = sessionStorage.getItem('gs_pref_students');
+                if (cached) {
+                    try {
+                        students = JSON.parse(cached);
+                        if (sessionRole === 'Student' && students.length > 0) openStudentProfile(students[0].id);
+                        else renderStudents();
+                    } catch(e) {}
+                } else {
+                    container.innerHTML = '<div style="text-align:center; padding: 40px; color: #94a3b8;">Loading database...</div>';
+                }
+            }
+
+            // 2. Silently fetch fresh data
             try {
                 const payload = { action: 'get_students', username: sessionUser, token: sessionToken, adminUsername: sessionUser, adminToken: sessionToken };
                 const response = await fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) });
@@ -519,18 +438,21 @@ body {
                 
                 if (result.status === 'success') { 
                     students = result.students; 
-                    if (result.role === 'Student') {
-                        document.getElementById('addStudentBtn').style.display = 'none';
-                        document.getElementById('segmentControl').style.display = 'none';
-                        document.getElementById('searchBarGroup').style.display = 'none';
-                        document.getElementById('navDirText').innerText = 'My Profile';
+                    sessionStorage.setItem('gs_pref_students', JSON.stringify(students));
+                    
+                    if (sessionRole === 'Student') {
                         if(students.length > 0) openStudentProfile(students[0].id);
                     } else {
-                        document.getElementById('adminDeleteBtn').style.display = 'block';
                         renderStudents(); 
                     }
-                } else { container.innerHTML = `<div style="text-align:center; color: #ef4444;">Error: ${result.message}</div>`; }
-            } catch (error) { container.innerHTML = '<div style="text-align:center; color: #ef4444;">Network connection failed.</div>'; }
+                } else if (forceNetwork || !sessionStorage.getItem('gs_pref_students')) { 
+                    container.innerHTML = `<div style="text-align:center; color: #ef4444;">Error: ${result.message}</div>`; 
+                }
+            } catch (error) { 
+                if (forceNetwork || !sessionStorage.getItem('gs_pref_students')) {
+                    container.innerHTML = '<div style="text-align:center; color: #ef4444;">Network connection failed.</div>'; 
+                }
+            }
         }
 
         function openStudentProfile(studentId) {
@@ -555,7 +477,6 @@ body {
                 const safeName = (s.name || "").toString().toLowerCase();
                 const safeClass = (s.class || "").toString().toLowerCase();
                 const safeMobile = (s.mobile || "").toString();
-
                 const matchesSearch = safeName.includes(searchQuery) || safeClass.includes(searchQuery) || safeMobile.includes(searchQuery);
                 return matchesStatus && matchesSearch;
             });
@@ -565,9 +486,9 @@ body {
             const grouped = {};
             filtered.forEach(s => { if (!grouped[s.class]) grouped[s.class] = []; grouped[s.class].push(s); });
 
-            let isFirstGroup = true;
+            // Classes are collapsed by default
             for (const className in grouped) {
-                const groupDiv = document.createElement('div'); groupDiv.className = `class-group ${isFirstGroup ? 'active' : ''}`; isFirstGroup = false;
+                const groupDiv = document.createElement('div'); groupDiv.className = `class-group`;
                 const classNum = className.match(/\d+/) ? className.match(/\d+/)[0] : className.charAt(0);
                 const titleText = className.toLowerCase().includes('class') ? className : `Class ${className}`;
 
@@ -638,11 +559,20 @@ body {
                 const text = await response.text();
                 try {
                     const result = JSON.parse(text);
-                    if (result.status === 'success') { await showCustomAlert("Success", result.message, "success"); closeStudentModal(); fetchStudents(); } 
+                    if (result.status === 'success') { 
+                        await showCustomAlert("Success", result.message, "success"); 
+                        closeStudentModal(); 
+                        
+                        // Signal dashboard cache update and force network fetch
+                        try { window.parent.postMessage({ action: 'refreshCache' }, '*'); } catch(e){}
+                        fetchStudents(true); 
+                    } 
                     else { await showCustomAlert("Error", result.message, "error"); }
                 } catch (e) {
                     await showCustomAlert("Saved with Warning", "Data saved, but Google Drive image block triggered. Check your Google Drive permissions.", "warning");
-                    closeStudentModal(); fetchStudents();
+                    closeStudentModal(); 
+                    try { window.parent.postMessage({ action: 'refreshCache' }, '*'); } catch(e){}
+                    fetchStudents(true);
                 }
             } catch (error) { await showCustomAlert("Network Error", "Failed to communicate with server.", "error"); }
             finally { btn.innerText = originalText; btn.disabled = false; }
@@ -658,69 +588,45 @@ body {
                 const response = await fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) });
                 const result = await response.json();
                 
-                if (result.status === 'success') { await showCustomAlert("Deleted", result.message, "success"); switchTab('students', document.getElementById('navDir')); fetchStudents(); } 
+                if (result.status === 'success') { 
+                    await showCustomAlert("Deleted", result.message, "success"); 
+                    switchTab('students', document.getElementById('navDir')); 
+                    
+                    try { window.parent.postMessage({ action: 'refreshCache' }, '*'); } catch(e){}
+                    fetchStudents(true); 
+                } 
                 else { await showCustomAlert("Error", result.message, "error"); }
             } catch (error) { await showCustomAlert("Network Error", "Failed to communicate with server.", "error"); }
         }
 
-        
-function fixBottomNav() {
-    const nav = document.querySelector('.app-nav');
-    if (!nav) return;
+        function fixBottomNav() {
+            const nav = document.querySelector('.app-nav');
+            if (!nav) return;
+            nav.style.display = 'none';
+            requestAnimationFrame(() => {
+                nav.offsetHeight;
+                nav.style.display = 'flex';
+            });
+        }
 
-    nav.style.display = 'none';
+        window.addEventListener('resize', fixBottomNav);
+        window.addEventListener('orientationchange', fixBottomNav);
 
-    requestAnimationFrame(() => {
-        nav.offsetHeight;
-        nav.style.display = 'flex';
-    });
-}
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden) fixBottomNav();
+        });
+        window.addEventListener('message', (event) => {
+            if (event.data && event.data.action === 'fixBottomNav') {
+                setTimeout(fixBottomNav, 100);
+                setTimeout(fixBottomNav, 300);
+                setTimeout(fixBottomNav, 600);
+            }
+        });
 
-window.addEventListener('resize', fixBottomNav);
-window.addEventListener('orientationchange', fixBottomNav);
-
-document.addEventListener('visibilitychange', () => {
-    if (!document.hidden) fixBottomNav();
-});
-window.addEventListener('message', (event) => {
-    if (event.data && event.data.action === 'fixBottomNav') {
-        setTimeout(fixBottomNav, 100);
-        setTimeout(fixBottomNav, 300);
-        setTimeout(fixBottomNav, 600);
-    }
-});
-
-function forcePWALayoutRefresh() {
-    const nav = document.querySelector('.app-nav');
-    const container = document.querySelector('.view-container');
-
-    if (!nav || !container) return;
-
-    const navHeight = nav.offsetHeight;
-
-    container.style.top = '0';
-container.style.bottom = navHeight + 'px';
-container.style.height = 'auto';
-
-    nav.style.display = 'none';
-
-    requestAnimationFrame(() => {
-        nav.style.display = 'flex';
-    });
-}
-
-window.onload = () => {
-    fetchStudents();
-
-    setTimeout(forcePWALayoutRefresh, 100);
-    setTimeout(forcePWALayoutRefresh, 500);
-    setTimeout(forcePWALayoutRefresh, 1000);
-    setTimeout(forcePWALayoutRefresh, 2000);
-};
-
-window.addEventListener('focus', forcePWALayoutRefresh);
-window.addEventListener('resize', forcePWALayoutRefresh);
-window.addEventListener('orientationchange', forcePWALayoutRefresh);
+        window.onload = () => {
+            fetchStudents();
+            setTimeout(fixBottomNav, 100);
+        };
     </script>
 </body>
 </html>
