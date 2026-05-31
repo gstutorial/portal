@@ -89,15 +89,19 @@
 
         .user-profile {
             width: 100%; background: rgba(255,255,255,0.05); padding: 15px; border-radius: 16px;
-            border: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; gap: 12px; margin-bottom: 30px;
+            border: 1px solid rgba(255,255,255,0.1); display: flex; align-items: flex-start; gap: 12px; margin-bottom: 30px;
         }
         .avatar {
             width: 45px; height: 45px; background: linear-gradient(135deg, #2563eb, #06b6d4);
             border-radius: 50%; display: flex; align-items: center; justify-content: center;
             font-weight: bold; font-size: 18px; flex-shrink: 0;
         }
+        
         .user-info { flex: 1; min-width: 0; }
-        .user-info h3 { font-size: 15px; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .user-fullname { font-size: 15px; font-weight: 800; color: white; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .username-tag { font-size: 11px; color: #38bdf8; font-family: monospace; margin-bottom: 6px; }
+        .user-contact { font-size: 11px; color: #94a3b8; margin-bottom: 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
         .role-badge {
             font-size: 10px; padding: 3px 8px; border-radius: 8px; display: inline-block;
             background: rgba(37,99,235,0.3); color: #60a5fa; border: 1px solid rgba(37,99,235,0.5);
@@ -235,7 +239,9 @@
             <div class="user-profile">
                 <div class="avatar" id="userInitials">U</div>
                 <div class="user-info">
-                    <h3 id="displayUsername">Loading...</h3>
+                    <div class="user-fullname" id="displayFullName">Loading...</div>
+                    <div class="username-tag" id="displayUsername">@username</div>
+                    <div class="user-contact" id="displayContact">email • mobile</div>
                     <div class="role-badge" id="displayRole">User</div>
                 </div>
             </div>
@@ -357,8 +363,17 @@
 
         function renderSidebar(username) {
             const role = localStorage.getItem('gs_role') || 'User';
-            document.getElementById('displayUsername').innerText = username;
-            document.getElementById('userInitials').innerText = username.charAt(0).toUpperCase();
+            
+            // Fetch Full Name, Email, and Mobile from localStorage
+            const fullName = localStorage.getItem('gs_fullname') || username;
+            const email = localStorage.getItem('gs_email') || 'No Email provided';
+            const mobile = localStorage.getItem('gs_mobile') || 'No Mobile provided';
+
+            document.getElementById('displayFullName').innerText = fullName;
+            document.getElementById('displayUsername').innerText = '@' + username;
+            document.getElementById('displayContact').innerText = `${email} • ${mobile}`;
+            document.getElementById('userInitials').innerText = fullName.charAt(0).toUpperCase();
+
             const roleBadge = document.getElementById('displayRole');
             roleBadge.innerText = role;
             if (role === 'Admin') { roleBadge.classList.add('role-admin'); document.getElementById('adminSection').style.display = 'block'; }
@@ -443,7 +458,7 @@
             }
         });
 
-       function closeApp() {
+        function closeApp() {
             document.getElementById('appViewer').src = '';
             document.getElementById('appViewer').style.display = 'none';
             
