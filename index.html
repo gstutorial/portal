@@ -318,9 +318,18 @@ let pendingRole = '';
 
             try {
                 const response = await fetch(API_URL, {
-                    method: 'POST',
-                    body: JSON.stringify({ action: 'login', username: user, password: hashedPass, rawPassword: rawPass })
-                });
+    method: 'POST',
+    redirect: 'follow',
+    headers: {
+        'Content-Type': 'text/plain;charset=utf-8'
+    },
+    body: JSON.stringify({
+        action: 'login',
+        username: user,
+        password: hashedPass,
+        rawPassword: rawPass
+    })
+});
                 
                 const result = await response.json();
 
@@ -389,14 +398,18 @@ else {
 
             try {
                 const response = await fetch(API_URL, {
-                    method: 'POST',
-                    body: JSON.stringify({ 
-                        action: 'set_first_password', 
-                        username: tempUsername, 
-                        oldPassword: tempOldPassword,
-                        newPasswordHash: newHashedPass
-                    })
-                });
+    method: 'POST',
+    redirect: 'follow',
+    headers: {
+        'Content-Type': 'text/plain;charset=utf-8'
+    },
+    body: JSON.stringify({
+        action: 'set_first_password',
+        username: tempUsername,
+        oldPassword: tempOldPassword,
+        newPasswordHash: newHashedPass
+    })
+});
                 
                 const result = await response.json();
 
@@ -438,24 +451,18 @@ async function verifyOTP(e) {
 
     try {
 
-        const response =
-            await fetch(
-                API_URL,
-                {
-                    method:'POST',
-                    body:JSON.stringify({
-
-                        action:'verify_otp',
-
-                        username:
-                            pendingUsername,
-
-                        otp:otp
-
-                    })
-                }
-            );
-
+        const response = await fetch(API_URL, {
+    method:'POST',
+    redirect:'follow',
+    headers:{
+        'Content-Type':'text/plain;charset=utf-8'
+    },
+    body:JSON.stringify({
+        action:'verify_otp',
+        username: pendingUsername,
+        otp: otp
+    })
+});
         const result =
             await response.json();
 
