@@ -325,33 +325,22 @@ let pendingRole = '';
                 const result = await response.json();
 
                 if (result.status === 'success') {
-                    localStorage.setItem('gs_token', result.token);
-                    localStorage.setItem('gs_username', user);
-                    localStorage.setItem('gs_role', result.role);
-                    localStorage.setItem('gs_access', JSON.stringify(result.access));
-                    
-                    window.location.href = 'dashboard.html';
-                    else if (
-    result.status === 'otp_required'
-) {
 
-    pendingUsername =
-        result.username;
+    localStorage.setItem('gs_token', result.token);
+    localStorage.setItem('gs_username', user);
+    localStorage.setItem('gs_role', result.role);
+    localStorage.setItem('gs_access', JSON.stringify(result.access));
 
-    pendingRole =
-        result.role;
+    window.location.href = 'dashboard.html';
 
-    document
-        .getElementById(
-            'loginForm'
-        )
-        .style.display = 'none';
+}
+else if (result.status === 'otp_required') {
 
-    document
-        .getElementById(
-            'otpSection'
-        )
-        .style.display = 'block';
+    pendingUsername = result.username;
+    pendingRole = result.role;
+
+    document.getElementById('loginForm').style.display = 'none';
+    document.getElementById('otpSection').style.display = 'block';
 
     showToast(
         'Verification code sent to your email',
@@ -359,21 +348,24 @@ let pendingRole = '';
     );
 
 }
+else if (result.status === 'first_login') {
 
-                } else if (result.status === 'first_login') {
-                    tempUsername = user;
-                    tempOldPassword = rawPass; 
-                    
-                    document.getElementById('loginForm').style.display = 'none';
-                    document.getElementById('firstLoginSection').style.display = 'block';
-                    document.getElementById('mainCard').style.animation = 'none';
-                    document.getElementById('mainCard').offsetHeight; 
-                    document.getElementById('mainCard').style.animation = 'fadeIn 0.4s ease-out';
-                    
-                } else {
-                    showToast(result.message);
-                }
+    tempUsername = user;
+    tempOldPassword = rawPass;
 
+    document.getElementById('loginForm').style.display = 'none';
+    document.getElementById('firstLoginSection').style.display = 'block';
+
+    document.getElementById('mainCard').style.animation = 'none';
+    document.getElementById('mainCard').offsetHeight;
+    document.getElementById('mainCard').style.animation = 'fadeIn 0.4s ease-out';
+
+}
+else {
+
+    showToast(result.message);
+
+}
             } catch (error) {
                 showToast("Network Error. Please try again.");
             }
