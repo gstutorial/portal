@@ -1,4 +1,4 @@
 // Global Configuration File
 const GS_CONFIG = {
-    API_URL: 'https://script.google.com/macros/s/AKfycbx9VXwSW5oCP4YExb5CzRnSZ2b_aDWZFPhhrv0v5GQMF9l-UQnEo2UN7IxanLmFVBhcQw/exec'
+    API_URL: 'https://script.google.com/macros/s/AKfycbzmkGpKRVs613Vqn40mG1nspky0JE0GWEbFRWaesW331WnE1dqTYuySlQW0VvN_ULyUXA/exec'
 };
