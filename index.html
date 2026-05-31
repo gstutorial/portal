@@ -325,10 +325,17 @@
                 }
 
                 if (result.status === 'success') {
+                    // SAVE CORE AUTH DATA
                     localStorage.setItem('gs_token', result.token);
                     localStorage.setItem('gs_username', user);
                     localStorage.setItem('gs_role', result.role);
                     localStorage.setItem('gs_access', JSON.stringify(result.access));
+                    
+                    // NEW: SAVE PROFILE DATA FOR DASHBOARD SIDEBAR
+                    localStorage.setItem('gs_fullname', result.fullName || '');
+                    localStorage.setItem('gs_email', result.email || '');
+                    localStorage.setItem('gs_mobile', result.mobile || '');
+                    
                     window.location.href = 'dashboard.html';
                 } 
                 else if (result.status === 'otp_required') {
@@ -442,10 +449,16 @@
                 }
 
                 if (result.status === 'success') {
+                    // SAVE CORE AUTH DATA
                     localStorage.setItem('gs_token', result.token);
                     localStorage.setItem('gs_username', pendingUsername);
                     localStorage.setItem('gs_role', result.role);
                     localStorage.setItem('gs_access', JSON.stringify(result.access));
+
+                    // NEW: SAVE PROFILE DATA FOR DASHBOARD SIDEBAR
+                    localStorage.setItem('gs_fullname', result.fullName || '');
+                    localStorage.setItem('gs_email', result.email || '');
+                    localStorage.setItem('gs_mobile', result.mobile || '');
 
                     window.location.href = 'dashboard.html';
                 } else {
