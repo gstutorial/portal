@@ -1,563 +1,548 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-    <meta http-equiv="Pragma" content="no-cache">
-    <meta http-equiv="Expires" content="0">
-    
-    <title>GS Secure Access Portal</title>
-    
-    <link rel="manifest" href="manifest.json">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <link rel="apple-touch-icon" href="logo.png">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    
+    <title>GS Secure Access Portal</title>
+    
+    <link rel="manifest" href="manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="logo.png">
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
 
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        
-        body {
-            font-family: Arial, sans-serif;
-            background: radial-gradient(circle at top, #1e3a8a 0%, #0f172a 40%, #020617 100%);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 15px;
-            color: white;
-        }
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: Arial, sans-serif;
+            background: radial-gradient(circle at top, #1e3a8a 0%, #0f172a 40%, #020617 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 15px;
+            color: white;
+        }
 
-        .container {
-            width: 100%;
-            max-width: 420px;
-            background: linear-gradient(135deg, rgba(255,255,255,0.10), rgba(255,255,255,0.04));
-            border-radius: 30px;
-            padding: 35px 25px;
-            border: 1px solid rgba(255,255,255,0.10);
-            backdrop-filter: blur(20px);
-            box-shadow: 0 15px 50px rgba(0,0,0,0.45);
-            animation: fadeIn 0.6s ease-out;
-        }
+        .container {
+            width: 100%;
+            max-width: 420px;
+            background: linear-gradient(135deg, rgba(255,255,255,0.10), rgba(255,255,255,0.04));
+            border-radius: 30px;
+            padding: 35px 25px;
+            border: 1px solid rgba(255,255,255,0.10);
+            backdrop-filter: blur(20px);
+            box-shadow: 0 15px 50px rgba(0,0,0,0.45);
+            animation: fadeIn 0.6s ease-out;
+        }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
 
-        .logo-container { text-align: center; margin-bottom: 20px; }
-        
-        /* Updated Logo: Clean, no circle, no shadow */
-        .logo {
-            height: 75px; 
-            width: auto;
-            max-width: 100%;
-            object-fit: contain;
-            margin-bottom: 15px;
-        }
+        .logo-container { text-align: center; margin-bottom: 20px; }
+        
+        /* Updated Logo: Clean, no circle, no shadow */
+        .logo {
+            height: 75px; 
+            width: auto;
+            max-width: 100%;
+            object-fit: contain;
+            margin-bottom: 15px;
+        }
 
-        .title { text-align: center; font-size: 24px; font-weight: 800; }
-        .subtitle { text-align: center; color: #cbd5e1; font-size: 14px; margin-top: 8px; margin-bottom: 25px; }
+        .title { text-align: center; font-size: 24px; font-weight: 800; }
+        .subtitle { text-align: center; color: #cbd5e1; font-size: 14px; margin-top: 8px; margin-bottom: 25px; }
 
-        .input-group { margin-bottom: 15px; }
-        .input-group label { display: block; font-size: 13px; font-weight: 600; color: #94a3b8; margin-bottom: 5px; }
+        .input-group { margin-bottom: 15px; }
+        .input-group label { display: block; font-size: 13px; font-weight: 600; color: #94a3b8; margin-bottom: 5px; }
 
-        /* Password Wrapper for Eye Icon */
-        .password-wrapper { position: relative; display: flex; align-items: center; }
-        
-        .input-field {
-            width: 100%;
-            background: rgba(255, 255, 255, 0.06);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 14px;
-            padding: 14px;
-            color: white;
-            font-size: 15px;
-            outline: none;
-            transition: 0.3s;
-        }
+        /* Password Wrapper for Eye Icon */
+        .password-wrapper { position: relative; display: flex; align-items: center; }
+        
+        .input-field {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 14px;
+            padding: 14px;
+            color: white;
+            font-size: 15px;
+            outline: none;
+            transition: 0.3s;
+        }
 
-        .password-wrapper .input-field { padding-right: 45px; /* Room for icon */ }
+        .password-wrapper .input-field { padding-right: 45px; /* Room for icon */ }
 
-        .input-field:focus { border-color: #38bdf8; background: rgba(255, 255, 255, 0.1); }
+        .input-field:focus { border-color: #38bdf8; background: rgba(255, 255, 255, 0.1); }
 
-        .eye-btn {
-            position: absolute; right: 15px; background: none; border: none;
-            color: #94a3b8; cursor: pointer; display: flex; align-items: center;
-            justify-content: center; padding: 0; transition: color 0.2s;
-        }
-        .eye-btn:hover { color: white; }
+        .eye-btn {
+            position: absolute; right: 15px; background: none; border: none;
+            color: #94a3b8; cursor: pointer; display: flex; align-items: center;
+            justify-content: center; padding: 0; transition: color 0.2s;
+        }
+        .eye-btn:hover { color: white; }
 
-        .primary-btn {
-            width: 100%; border: none; border-radius: 16px; padding: 15px;
-            background: linear-gradient(135deg, #2563eb, #06b6d4);
-            color: white; font-size: 16px; font-weight: 800; cursor: pointer;
-            box-shadow: 0 10px 25px rgba(37,99,235,0.35);
-            transition: 0.3s; margin-top: 10px;
-            display: flex; justify-content: center; align-items: center; gap: 8px;
-        }
+        .primary-btn {
+            width: 100%; border: none; border-radius: 16px; padding: 15px;
+            background: linear-gradient(135deg, #2563eb, #06b6d4);
+            color: white; font-size: 16px; font-weight: 800; cursor: pointer;
+            box-shadow: 0 10px 25px rgba(37,99,235,0.35);
+            transition: 0.3s; margin-top: 10px;
+            display: flex; justify-content: center; align-items: center; gap: 8px;
+        }
 
-        .primary-btn:active { transform: scale(0.97); }
-        .primary-btn:disabled { opacity: 0.7; cursor: not-allowed; }
+        .primary-btn:active { transform: scale(0.97); }
+        .primary-btn:disabled { opacity: 0.7; cursor: not-allowed; }
 
-        #firstLoginSection { display: none; }
-        
-        #toast {
-            position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
-            padding: 14px 20px; border-radius: 18px; color: white; font-weight: 700;
-            z-index: 9999; display: none; text-align: center;
-            box-shadow: 0 10px 35px rgba(0,0,0,0.40);
-        }
+        #firstLoginSection { display: none; }
+        
+        #toast {
+            position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+            padding: 14px 20px; border-radius: 18px; color: white; font-weight: 700;
+            z-index: 9999; display: none; text-align: center;
+            box-shadow: 0 10px 35px rgba(0,0,0,0.40);
+        }
 
-        .spinner {
-            width: 20px; height: 20px; border: 3px solid rgba(255,255,255,0.3);
-            border-radius: 50%; border-top-color: white;
-            animation: spin 1s ease-in-out infinite; display: none;
-        }
-        @keyframes spin { to { transform: rotate(360deg); } }
+        .spinner {
+            width: 20px; height: 20px; border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%; border-top-color: white;
+            animation: spin 1s ease-in-out infinite; display: none;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
 
-        .creator-tag { text-align: center; font-size: 13px; color: #94a3b8; margin-top: 25px; font-weight: 600; }
+        .creator-tag { text-align: center; font-size: 13px; color: #94a3b8; margin-top: 25px; font-weight: 600; }
 
-        .install-fab {
-            position: fixed; bottom: 20px; right: 20px;
-            background: linear-gradient(135deg, #10b981, #059669); color: white;
-            border: none; border-radius: 50px; padding: 14px 24px;
-            font-size: 15px; font-weight: 800; box-shadow: 0 5px 20px rgba(0,0,0,0.4);
-            cursor: pointer; z-index: 1000; display: none; align-items: center; gap: 8px;
-        }
-    </style>
+        .install-fab {
+            position: fixed; bottom: 20px; right: 20px;
+            background: linear-gradient(135deg, #10b981, #059669); color: white;
+            border: none; border-radius: 50px; padding: 14px 24px;
+            font-size: 15px; font-weight: 800; box-shadow: 0 5px 20px rgba(0,0,0,0.4);
+            cursor: pointer; z-index: 1000; display: none; align-items: center; gap: 8px;
+        }
+    </style>
 </head>
 <body>
 
-    <div id="toast"></div>
+    <div id="toast"></div>
 
-    <div class="container" id="mainCard">
-        
-        <div class="logo-container">
-            <img src="logo.png" alt="GS Logo" class="logo" onerror="this.style.display='none'">
-            <div class="title">GS Secure Portal</div>
-            <div class="subtitle">Authorized Access Only</div>
-        </div>
+    <div class="container" id="mainCard">
+        
+        <div class="logo-container">
+            <img src="logo.png" alt="GS Logo" class="logo" onerror="this.style.display='none'">
+            <div class="title">GS Secure Portal</div>
+            <div class="subtitle">Authorized Access Only</div>
+        </div>
 
-        <form id="loginForm" onsubmit="attemptLogin(event)">
-            <div class="input-group">
-                <label>Username</label>
-                <input type="text" id="username" class="input-field" required autocomplete="username">
-            </div>
-            
-            <div class="input-group">
-                <label>Password</label>
-                <div class="password-wrapper">
-                    <input type="password" id="password" class="input-field" required autocomplete="current-password">
-                    <button type="button" class="eye-btn" onclick="toggleVisibility('password', 'eyeIconMain')">
-                        <svg id="eyeIconMain" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle>
-                        </svg>
-                    </button>
-                </div>
-            </div>
+        <form id="loginForm" onsubmit="attemptLogin(event)">
+            <div class="input-group">
+                <label>Username</label>
+                <input type="text" id="username" class="input-field" required autocomplete="username">
+            </div>
+            
+            <div class="input-group">
+                <label>Password</label>
+                <div class="password-wrapper">
+                    <input type="password" id="password" class="input-field" required autocomplete="current-password">
+                    <button type="button" class="eye-btn" onclick="toggleVisibility('password', 'eyeIconMain')">
+                        <svg id="eyeIconMain" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle>
+                        </svg>
+                    </button>
+                </div>
+            </div>
 
-            <button type="submit" class="primary-btn" id="loginBtn">
-                <span>Sign In</span>
-                <div class="spinner" id="loginSpinner"></div>
-            </button>
-        </form>
-        <form id="otpSection" style="display:none;" onsubmit="verifyOTP(event)">
+            <button type="submit" class="primary-btn" id="loginBtn">
+                <span>Sign In</span>
+                <div class="spinner" id="loginSpinner"></div>
+            </button>
+        </form>
+        <form id="otpSection" style="display:none;" onsubmit="verifyOTP(event)">
 
-    <div class="subtitle" style="color:#38bdf8;font-weight:bold;">
-        Verification code has been sent to your registered email.
-    </div>
+    <div class="subtitle" style="color:#38bdf8;font-weight:bold;">
+        Verification code has been sent to your registered email.
+    </div>
 
-    <div class="input-group">
-        <label>Verification Code</label>
-        <input
-            type="text"
-            id="otpCode"
-            class="input-field"
-            required
-            maxlength="6">
-    </div>
+    <div class="input-group">
+        <label>Verification Code</label>
+        <input
+            type="text"
+            id="otpCode"
+            class="input-field"
+            required
+            maxlength="6">
+    </div>
 
-    <button type="submit" class="primary-btn" id="otpBtn">
-        <span>Verify Code</span>
-        <div class="spinner" id="otpSpinner"></div>
-    </button>
+    <button type="submit" class="primary-btn" id="otpBtn">
+        <span>Verify Code</span>
+        <div class="spinner" id="otpSpinner"></div>
+    </button>
 
 </form>
 
-        <form id="firstLoginSection" onsubmit="setNewPassword(event)">
-            <div class="subtitle" style="color: #fbbf24; font-weight: bold;">
-                Action Required: Please set a new, permanent password to continue.
-            </div>
-            
-            <div class="input-group">
-                <label>New Password</label>
-                <div class="password-wrapper">
-                    <input type="password" id="newPassword" class="input-field" required minlength="6">
-                    <button type="button" class="eye-btn" onclick="toggleVisibility('newPassword', 'eyeIconNew')">
-                        <svg id="eyeIconNew" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle>
-                        </svg>
-                    </button>
-                </div>
-            </div>
+        <form id="firstLoginSection" onsubmit="setNewPassword(event)">
+            <div class="subtitle" style="color: #fbbf24; font-weight: bold;">
+                Action Required: Please set a new, permanent password to continue.
+            </div>
+            
+            <div class="input-group">
+                <label>New Password</label>
+                <div class="password-wrapper">
+                    <input type="password" id="newPassword" class="input-field" required minlength="6">
+                    <button type="button" class="eye-btn" onclick="toggleVisibility('newPassword', 'eyeIconNew')">
+                        <svg id="eyeIconNew" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle>
+                        </svg>
+                    </button>
+                </div>
+            </div>
 
-            <div class="input-group">
-                <label>Confirm New Password</label>
-                <div class="password-wrapper">
-                    <input type="password" id="confirmPassword" class="input-field" required minlength="6">
-                    <button type="button" class="eye-btn" onclick="toggleVisibility('confirmPassword', 'eyeIconConfirm')">
-                        <svg id="eyeIconConfirm" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle>
-                        </svg>
-                    </button>
-                </div>
-            </div>
+            <div class="input-group">
+                <label>Confirm New Password</label>
+                <div class="password-wrapper">
+                    <input type="password" id="confirmPassword" class="input-field" required minlength="6">
+                    <button type="button" class="eye-btn" onclick="toggleVisibility('confirmPassword', 'eyeIconConfirm')">
+                        <svg id="eyeIconConfirm" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle>
+                        </svg>
+                    </button>
+                </div>
+            </div>
 
-            <button type="submit" class="primary-btn" id="resetBtn">
-                <span>Save & Login</span>
-                <div class="spinner" id="resetSpinner"></div>
-            </button>
-        </form>
+            <button type="submit" class="primary-btn" id="resetBtn">
+                <span>Save & Login</span>
+                <div class="spinner" id="resetSpinner"></div>
+            </button>
+        </form>
 
-        <div class="creator-tag">App Created By Gobind Sharma</div>
-    </div>
+        <div class="creator-tag">App Created By Gobind Sharma</div>
+    </div>
 
-    <button id="installAppBtn" class="install-fab">📲 Install App</button>
+    <button id="installAppBtn" class="install-fab">📲 Install App</button>
 
-    <script src="config.js"></script>
+    <script src="config.js"></script>
 
-    <script>
-        // ==========================================
-        // PWA INSTALL LOGIC
-        // ==========================================
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js').then(reg => {
-                    reg.update();
-                });
-            });
-        }
+    <script>
+        // ==========================================
+        // PWA INSTALL LOGIC
+        // ==========================================
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js').then(reg => {
+                    reg.update();
+                });
+            });
+        }
 
-        let deferredPrompt;
-        const installBtn = document.getElementById('installAppBtn');
+        let deferredPrompt;
+        const installBtn = document.getElementById('installAppBtn');
 
-        window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
-            deferredPrompt = e;
-            installBtn.style.display = 'flex';
-        });
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            installBtn.style.display = 'flex';
+        });
 
-        installBtn.addEventListener('click', async () => {
-            installBtn.style.display = 'none';
-            deferredPrompt.prompt();
-            const { outcome } = await deferredPrompt.userChoice;
-            deferredPrompt = null;
-        });
+        installBtn.addEventListener('click', async () => {
+            installBtn.style.display = 'none';
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            deferredPrompt = null;
+        });
 
-        // ==========================================
-        // CONFIGURATION
-        // ==========================================
-        const API_URL = GS_CONFIG.API_URL;
-        let tempUsername = '';
+        // ==========================================
+        // CONFIGURATION
+        // ==========================================
+        const API_URL = GS_CONFIG.API_URL;
+        let tempUsername = '';
 let tempOldPassword = '';
 
 let pendingUsername = '';
 let pendingRole = '';
 
-        // ==========================================
-        // UI HELPERS
-        // ==========================================
-        function showToast(message, type = 'error') {
-            const toast = document.getElementById('toast');
-            toast.innerText = message;
-            toast.style.background = type === 'success' ? 'linear-gradient(135deg, #059669, #10b981)' : 'linear-gradient(135deg, #dc2626, #ef4444)';
-            toast.style.display = 'block';
-            setTimeout(() => { toast.style.display = 'none'; }, 4000);
-        }
+        // ==========================================
+        // UI HELPERS
+        // ==========================================
+        function showToast(message, type = 'error') {
+            const toast = document.getElementById('toast');
+            toast.innerText = message;
+            toast.style.background = type === 'success' ? 'linear-gradient(135deg, #059669, #10b981)' : 'linear-gradient(135deg, #dc2626, #ef4444)';
+            toast.style.display = 'block';
+            setTimeout(() => { toast.style.display = 'none'; }, 4000);
+        }
 
-        function toggleLoading(btnId, spinnerId, isLoading) {
-            const btn = document.getElementById(btnId);
-            const spinner = document.getElementById(spinnerId);
-            btn.disabled = isLoading;
-            spinner.style.display = isLoading ? 'block' : 'none';
-            btn.querySelector('span').style.display = isLoading ? 'none' : 'block';
-        }
+        function toggleLoading(btnId, spinnerId, isLoading) {
+            const btn = document.getElementById(btnId);
+            const spinner = document.getElementById(spinnerId);
+            btn.disabled = isLoading;
+            spinner.style.display = isLoading ? 'block' : 'none';
+            btn.querySelector('span').style.display = isLoading ? 'none' : 'block';
+        }
 
-        // Toggle Password Eye Icon Function
-        function toggleVisibility(inputId, iconId) {
-            const input = document.getElementById(inputId);
-            const icon = document.getElementById(iconId);
-            
-            if (input.type === 'password') {
-                input.type = 'text';
-                // Eye-Off SVG Path
-                icon.innerHTML = `<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line>`;
-            } else {
-                input.type = 'password';
-                // Eye SVG Path
-                icon.innerHTML = `<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle>`;
-            }
-        }
+        // Toggle Password Eye Icon Function
+        function toggleVisibility(inputId, iconId) {
+            const input = document.getElementById(inputId);
+            const icon = document.getElementById(iconId);
+            
+            if (input.type === 'password') {
+                input.type = 'text';
+                // Eye-Off SVG Path
+                icon.innerHTML = `<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line>`;
+            } else {
+                input.type = 'password';
+                // Eye SVG Path
+                icon.innerHTML = `<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle>`;
+            }
+        }
 
-        // ==========================================
-        // CORE LOGIC
-        // ==========================================
-        async function attemptLogin(e) {
-            e.preventDefault();
-            
-            const user = document.getElementById('username').value.trim();
-            const rawPass = document.getElementById('password').value;
-            
-            const hashedPass = CryptoJS.SHA256(rawPass).toString();
-            
-            toggleLoading('loginBtn', 'loginSpinner', true);
+        // ==========================================
+        // CORE LOGIC
+        // ==========================================
+        async function attemptLogin(e) {
+            e.preventDefault();
+            
+            const user = document.getElementById('username').value.trim();
+            const rawPass = document.getElementById('password').value;
+            
+            const hashedPass = CryptoJS.SHA256(rawPass).toString();
+            
+            toggleLoading('loginBtn', 'loginSpinner', true);
 
-            try {
-                const response = await fetch(API_URL, {
-    method: 'POST',
-    redirect: 'follow', // THIS IS THE FIX THAT WAS MISSING
-    headers: {
-        'Content-Type': 'text/plain;charset=utf-8'
-    },
-    body: JSON.stringify({
-        action: 'login',
-        username: user,
-        password: hashedPass,
-        rawPassword: rawPass
-    })
+            try {
+                const response = await fetch(API_URL, {
+    method: 'POST',
+    redirect: 'follow', // THIS IS THE FIX THAT WAS MISSING
+    headers: {
+        'Content-Type': 'text/plain;charset=utf-8'
+    },
+    body: JSON.stringify({
+        action: 'login',
+        username: user,
+        password: hashedPass,
+        rawPassword: rawPass
+    })
 });
 
 const text = await response.text();
-
-alert("SERVER RESPONSE:\n\n" + text);
-
-console.log("SERVER RESPONSE:", text);
 
 let result;
 
 try {
 
-    result = JSON.parse(text);
+    result = JSON.parse(text);
 
 } catch (e) {
 
-    console.error("JSON ERROR:", text);
+    console.error("JSON ERROR:", text);
 
-    alert(
-        "INVALID JSON RESPONSE:\n\n" +
-        text
-    );
-
-    throw e;
+    throw e;
 
 }
 
-                if (result.status === 'success') {
+                if (result.status === 'success') {
 
-    localStorage.setItem('gs_token', result.token);
-    localStorage.setItem('gs_username', user);
-    localStorage.setItem('gs_role', result.role);
-    localStorage.setItem('gs_access', JSON.stringify(result.access));
+    localStorage.setItem('gs_token', result.token);
+    localStorage.setItem('gs_username', user);
+    localStorage.setItem('gs_role', result.role);
+    localStorage.setItem('gs_access', JSON.stringify(result.access));
 
-    window.location.href = 'dashboard.html';
+    window.location.href = 'dashboard.html';
 
 }
 else if (result.status === 'otp_required') {
 
-    pendingUsername = result.username;
-    pendingRole = result.role;
+    pendingUsername = result.username;
+    pendingRole = result.role;
 
-    document.getElementById('loginForm').style.display = 'none';
-    document.getElementById('otpSection').style.display = 'block';
+    document.getElementById('loginForm').style.display = 'none';
+    document.getElementById('otpSection').style.display = 'block';
 
-    showToast(
-        'Verification code sent to your email',
-        'success'
-    );
+    showToast(
+        'Verification code sent to your email',
+        'success'
+    );
 
 }
 else if (result.status === 'first_login') {
 
-    tempUsername = user;
-    tempOldPassword = rawPass;
+    tempUsername = user;
+    tempOldPassword = rawPass;
 
-    document.getElementById('loginForm').style.display = 'none';
-    document.getElementById('firstLoginSection').style.display = 'block';
+    document.getElementById('loginForm').style.display = 'none';
+    document.getElementById('firstLoginSection').style.display = 'block';
 
-    document.getElementById('mainCard').style.animation = 'none';
-    document.getElementById('mainCard').offsetHeight;
-    document.getElementById('mainCard').style.animation = 'fadeIn 0.4s ease-out';
+    document.getElementById('mainCard').style.animation = 'none';
+    document.getElementById('mainCard').offsetHeight;
+    document.getElementById('mainCard').style.animation = 'fadeIn 0.4s ease-out';
 
 }
 else {
 
-    showToast(result.message);
+    showToast(result.message);
 
 }
-            } catch (error) {
+            } catch (error) {
 
-    console.error("LOGIN ERROR:", error);
+    console.error("LOGIN ERROR:", error);
 
-    alert(
-        "ERROR:\n" +
-        error.name + "\n\n" +
-        error.message
-    );
-
-    showToast(
-        "Network Error. Please try again."
-    );
+    showToast(
+        "Network Error. Please try again."
+    );
 }
-            
-            toggleLoading('loginBtn', 'loginSpinner', false);
-        }
+            
+            toggleLoading('loginBtn', 'loginSpinner', false);
+        }
 
-        async function setNewPassword(e) {
-            e.preventDefault();
-            
-            const newPass = document.getElementById('newPassword').value;
-            const confirmPass = document.getElementById('confirmPassword').value;
-            
-            if (newPass !== confirmPass) {
-                showToast("Passwords do not match!");
-                return;
-            }
+        async function setNewPassword(e) {
+            e.preventDefault();
+            
+            const newPass = document.getElementById('newPassword').value;
+            const confirmPass = document.getElementById('confirmPassword').value;
+            
+            if (newPass !== confirmPass) {
+                showToast("Passwords do not match!");
+                return;
+            }
 
-            const newHashedPass = CryptoJS.SHA256(newPass).toString();
-            toggleLoading('resetBtn', 'resetSpinner', true);
+            const newHashedPass = CryptoJS.SHA256(newPass).toString();
+            toggleLoading('resetBtn', 'resetSpinner', true);
 
-            try {
-                const response = await fetch(API_URL, {
-    method: 'POST',
-    redirect: 'follow',
-    headers: {
-        'Content-Type': 'text/plain;charset=utf-8'
-    },
-    body: JSON.stringify({
-        action: 'set_first_password',
-        username: tempUsername,
-        oldPassword: tempOldPassword,
-        newPasswordHash: newHashedPass
-    })
+            try {
+                const response = await fetch(API_URL, {
+    method: 'POST',
+    redirect: 'follow',
+    headers: {
+        'Content-Type': 'text/plain;charset=utf-8'
+    },
+    body: JSON.stringify({
+        action: 'set_first_password',
+        username: tempUsername,
+        oldPassword: tempOldPassword,
+        newPasswordHash: newHashedPass
+    })
 });
-                
-                const result = await response.json();
+                
+                const result = await response.json();
 
-                if (result.status === 'success') {
-                    showToast("Password Updated! Logging you in...", "success");
-                    
-                    document.getElementById('password').value = newPass;
-                    setTimeout(() => {
-                        document.getElementById('loginForm').style.display = 'block';
-                        document.getElementById('firstLoginSection').style.display = 'none';
-                        attemptLogin(new Event('submit')); 
-                    }, 1500);
-                } else {
-                    showToast(result.message);
-                }
-            } catch (error) {
-                showToast("Network Error. Please try again.");
-            }
-            
-            toggleLoading('resetBtn', 'resetSpinner', false);
-        }
+                if (result.status === 'success') {
+                    showToast("Password Updated! Logging you in...", "success");
+                    
+                    document.getElementById('password').value = newPass;
+                    setTimeout(() => {
+                        document.getElementById('loginForm').style.display = 'block';
+                        document.getElementById('firstLoginSection').style.display = 'none';
+                        attemptLogin(new Event('submit')); 
+                    }, 1500);
+                } else {
+                    showToast(result.message);
+                }
+            } catch (error) {
+                showToast("Network Error. Please try again.");
+            }
+            
+            toggleLoading('resetBtn', 'resetSpinner', false);
+        }
 async function verifyOTP(e) {
 
-    e.preventDefault();
+    e.preventDefault();
 
-    const otp =
-        document
-            .getElementById(
-                'otpCode'
-            )
-            .value
-            .trim();
+    const otp =
+        document
+            .getElementById(
+                'otpCode'
+            )
+            .value
+            .trim();
 
-    toggleLoading(
-        'otpBtn',
-        'otpSpinner',
-        true
-    );
+    toggleLoading(
+        'otpBtn',
+        'otpSpinner',
+        true
+    );
 
-    try {
+    try {
 
-        const response = await fetch(API_URL, {
-    method:'POST',
-    redirect:'follow',
-    headers:{
-        'Content-Type':'text/plain;charset=utf-8'
-    },
-    body:JSON.stringify({
-        action:'verify_otp',
-        username: pendingUsername,
-        otp: otp
-    })
+        const response = await fetch(API_URL, {
+    method:'POST',
+    redirect:'follow',
+    headers:{
+        'Content-Type':'text/plain;charset=utf-8'
+    },
+    body:JSON.stringify({
+        action:'verify_otp',
+        username: pendingUsername,
+        otp: otp
+    })
 });
-        const result =
-            await response.json();
+        const result =
+            await response.json();
 
-        if (
-            result.status ===
-            'success'
-        ) {
+        if (
+            result.status ===
+            'success'
+        ) {
 
-            localStorage.setItem(
-                'gs_token',
-                result.token
-            );
+            localStorage.setItem(
+                'gs_token',
+                result.token
+            );
 
-            localStorage.setItem(
-                'gs_username',
-                pendingUsername
-            );
+            localStorage.setItem(
+                'gs_username',
+                pendingUsername
+            );
 
-            localStorage.setItem(
-                'gs_role',
-                result.role
-            );
+            localStorage.setItem(
+                'gs_role',
+                result.role
+            );
 
-            localStorage.setItem(
-                'gs_access',
-                JSON.stringify(
-                    result.access
-                )
-            );
+            localStorage.setItem(
+                'gs_access',
+                JSON.stringify(
+                    result.access
+                )
+            );
 
-            window.location.href =
-                'dashboard.html';
+            window.location.href =
+                'dashboard.html';
 
-        } else {
+        } else {
 
-            showToast(
-                result.message
-            );
+            showToast(
+                result.message
+            );
 
-        }
+        }
 
-    } catch(error) {
+    } catch(error) {
 
-        showToast(
-            'Network Error'
-        );
+        showToast(
+            'Network Error'
+        );
 
-    }
+    }
 
-    toggleLoading(
-        'otpBtn',
-        'otpSpinner',
-        false
-    );
+    toggleLoading(
+        'otpBtn',
+        'otpSpinner',
+        false
+    );
 
 }
-        window.onload = () => {
-            if (localStorage.getItem('gs_token')) {
-                window.location.href = 'dashboard.html';
-            }
-        }
-    </script>
+        window.onload = () => {
+            if (localStorage.getItem('gs_token')) {
+                window.location.href = 'dashboard.html';
+            }
+        }
+    </script>
 </body>
 </html>
