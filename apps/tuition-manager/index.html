@@ -22,16 +22,16 @@
             display: flex; justify-content: space-around; background: rgba(15, 23, 42, 0.98);
             backdrop-filter: blur(10px); border-top: 1px solid rgba(255,255,255,0.05); 
             padding: 10px 10px calc(10px + env(safe-area-inset-bottom));
-            z-index: 9999; flex-shrink: 0;
+            z-index: 9999; flex-shrink: 0; width: 100%;
         }
         .nav-item { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; color: #94a3b8; cursor: pointer; padding: 0 12px; border-radius: 12px; transition: 0.3s; height: 50px; }
         .nav-item svg { width: 22px; height: 22px; }
         .nav-item span { font-size: 10px; font-weight: 700; }
         .nav-item.active { color: #38bdf8; background: rgba(56, 189, 248, 0.1); }
 
-        .view-container { flex: 1; position: relative; overflow: hidden; }
+        .view-container { flex: 1; position: relative; overflow: hidden; display: flex; flex-direction: column; }
         
-        .view-section { display: none; height: 100%; animation: fadeIn 0.3s ease; flex-direction: column; padding: 16px; }
+        .view-section { display: none; height: 100%; animation: fadeIn 0.3s ease; flex-direction: column; padding: 16px; flex: 1; overflow: hidden; }
         .view-section.active { display: flex; }
 
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
@@ -46,7 +46,7 @@
         .scrollable-list-area::-webkit-scrollbar { width: 4px; }
         .scrollable-list-area::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
 
-        .profile-action-buttons { display:flex; gap:8px; margin-bottom:24px; align-items:center; }
+        .profile-action-buttons { display:flex; gap:8px; margin-bottom:24px; align-items:center; flex-shrink: 0; }
         .profile-btn { flex:1; height:44px; min-height:44px; display:flex; align-items:center; justify-content:center; gap:6px; font-size:14px; font-weight:700; border-radius:12px; padding:0 12px; cursor: pointer; border: none; }
         .back-profile-btn { background:rgba(255,255,255,0.08); color: white; }
         .delete-profile-btn { background:#dc2626; color:white; box-shadow:0 4px 12px rgba(220,38,38,.35); }
@@ -90,18 +90,18 @@
         .icon-call { color: #38bdf8; }
 
         /* --- BROWSER-STYLE PROFILE TABS --- */
-        .profile-header { display:flex; align-items:center; gap:15px; padding-bottom:10px; margin-bottom:10px; }
+        .profile-header { display:flex; align-items:center; gap:15px; padding-bottom:10px; margin-bottom:10px; flex-shrink: 0;}
         .p-avatar { width: 70px; height: 70px; border-radius: 50%; overflow: hidden; border: 2px solid rgba(255,255,255,0.2); flex-shrink: 0;}
         .p-avatar img, .p-avatar svg { width: 100%; height: 100%; object-fit: cover; }
         .p-info h2 { font-size: 22px; font-weight: 800; margin-bottom: 4px; }
         .p-info p { font-size: 13px; color: #94a3b8; }
         
-        .profile-nav { display: flex; overflow-x: auto; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .profile-nav { display: flex; overflow-x: auto; border-bottom: 1px solid rgba(255,255,255,0.1); flex-shrink: 0;}
         .profile-nav::-webkit-scrollbar { display: none; } 
         .p-tab { padding: 10px 16px; font-size: 13px; font-weight: bold; color: #94a3b8; background: rgba(0,0,0,0.2); cursor: pointer; white-space: nowrap; transition: 0.2s; border-radius: 12px 12px 0 0; margin-right: 4px; border: 1px solid transparent; border-bottom: none; }
         .p-tab.active { background: rgba(15, 23, 42, 0.95); color: white; border-color: rgba(255,255,255,0.1); margin-bottom: -1px; }
         
-        .p-tab-content-wrapper { background: rgba(15, 23, 42, 0.95); border: 1px solid rgba(255,255,255,0.1); border-top: none; border-radius: 0 0 16px 16px; padding: 15px; }
+        .p-tab-content-wrapper { background: rgba(15, 23, 42, 0.95); border: 1px solid rgba(255,255,255,0.1); border-top: none; border-radius: 0 0 16px 16px; padding: 15px; flex: 1; overflow-y: auto;}
         .swipe-container { flex: 1; overflow: hidden; position: relative; }
         .p-tab-content { display: none; animation: fadeIn 0.3s ease; }
         
@@ -123,7 +123,7 @@
         .dialog-actions { display: flex; gap: 10px; width: 100%; justify-content: center; }
 
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); backdrop-filter: blur(5px); display: none; justify-content: center; align-items: flex-start; padding-top: 15px; z-index: 1000; }
-        .modal { background:#0f172a; width:calc(100% - 24px); max-width:620px; border-radius:20px; padding:18px; max-height:88vh; overflow-y:auto; border:1px solid rgba(255,255,255,0.15); box-shadow:0 10px 40px rgba(0,0,0,0.4); }
+        .modal { background:#0f172a; width:calc(100% - 24px); max-width:620px; border-radius:20px; padding:18px; max-height:88vh; overflow-y:auto; border:1px solid rgba(255,255,255,0.15); box-shadow:0 10px 40px rgba(0,0,0,0.4); margin: auto; }
         
         @media (max-width: 768px) {
             .modal { width: calc(100% - 24px); max-width: none; padding: 16px; max-height: calc(100vh - 120px); margin-top: 0; margin-bottom: 90px; }
@@ -169,7 +169,7 @@
             <div class="scrollable-list-area" id="studentListContainer"></div>
         </div>
 
-        <div id="view-profile" class="view-section" style="overflow-y: auto;">
+        <div id="view-profile" class="view-section">
 
             <div class="profile-action-buttons">
                 <button id="backProfileBtn" class="btn profile-btn back-profile-btn" onclick="switchTab('students', document.getElementById('navDir'))">← Back</button>
@@ -278,15 +278,15 @@
                 <input type="file" id="stuPhoto" accept="image/*" style="display:none;" onchange="initCrop(event)">
             </div>
 
-            <div class="form-row">
+            <div class="form-row" id="formRow1">
                 <div class="form-group" style="flex: 2;"><label>Full Name</label><input type="text" id="stuName" class="form-control" placeholder="e.g. Rahul Kumar"></div>
                 <div class="form-group" style="flex: 1;"><label>Gender</label><select id="stuGender" class="form-control"><option value="Male">Male</option><option value="Female">Female</option></select></div>
             </div>
-            <div class="form-row">
+            <div class="form-row" id="formRow2">
                 <div class="form-group" style="flex: 1;"><label>Class/Grade</label><input type="text" id="stuClass" class="form-control" placeholder="e.g. Class 10"></div>
                 <div class="form-group" style="flex: 1;"><label>Monthly Fee</label><input type="number" id="stuFee" class="form-control" placeholder="1500"></div>
             </div>
-            <div class="form-row">
+            <div class="form-row" id="formRow3">
                 <div class="form-group" style="flex: 1;"><label>Joining Date</label><input type="date" id="stuJoinDate" class="form-control"></div>
                 <div class="form-group" style="flex: 1;"><label>Mobile No.</label><input type="tel" id="stuMobile" class="form-control" placeholder="10-digit number"></div>
             </div>
@@ -297,6 +297,11 @@
             <div class="form-group" id="statusGroup" style="display: none;">
                 <label>Enrollment Status</label>
                 <select id="stuStatus" class="form-control"><option value="Active">Active Student</option><option value="Inactive">Inactive / Left</option></select>
+            </div>
+
+            <div class="form-group" id="stuPasswordGroup" style="display: none; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px; margin-top: 10px;">
+                <label>Update Password</label>
+                <input type="text" id="stuPassword" class="form-control" placeholder="Leave blank to keep current password">
             </div>
 
             <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 10px;">
@@ -402,22 +407,24 @@
             // Apply UI Security Rules Instantly
             if (sessionRole === 'Student') {
                 const addBtn = document.getElementById('addStudentBtn');
-                const editBtn = document.getElementById('editProfileBtn');
-                const backBtn = document.getElementById('backProfileBtn'); // Select the back button
+                const backBtn = document.getElementById('backProfileBtn');
+                const adminDeleteBtn = document.getElementById('adminDeleteBtn');
 
-                if (addBtn) addBtn.remove();
-                if (editBtn) editBtn.remove();
-                if (backBtn) backBtn.remove(); // Remove back button for students
+                if (addBtn) addBtn.style.display = 'none';
+                if (backBtn) backBtn.style.display = 'none';
+                if (adminDeleteBtn) adminDeleteBtn.style.display = 'none';
 
                 document.getElementById('segmentControl').style.display = 'none';
                 document.getElementById('searchBarGroup').style.display = 'none';
                 document.getElementById('navDirText').innerText = 'My Profile';
+                document.getElementById('editProfileBtn').style.display = 'flex'; // Keep visible for Students
             } else {
                 document.getElementById('addStudentBtn').style.display = 'block';
                 document.getElementById('segmentControl').style.display = 'flex';
                 document.getElementById('searchBarGroup').style.display = 'block';
                 document.getElementById('adminDeleteBtn').style.display = 'block';
                 document.getElementById('editProfileBtn').style.display = 'flex';
+                document.getElementById('backProfileBtn').style.display = 'flex';
             }
 
             // 1. Instant Load from Cache
@@ -434,7 +441,7 @@
                 }
             }
 
-            // 2. Silently fetch fresh data (with Smart Diff)
+            // 2. Silently fetch fresh data
             try {
                 const payload = { action: 'get_students', username: sessionUser, token: sessionToken, adminUsername: sessionUser, adminToken: sessionToken };
                 const response = await fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) });
@@ -444,10 +451,9 @@
                     const oldStudentsStr = JSON.stringify(students);
                     const newStudentsStr = JSON.stringify(result.students);
                     
-                    // SMART DIFF: Only re-render if the database actually changed! Prevents accordion collapsing.
-                    if (oldStudentsStr !== newStudentsStr) {
+                    // SMART DIFF: Only re-render if the database actually changed OR if cache was empty
+                    if (students.length === 0 || oldStudentsStr !== newStudentsStr) {
                         
-                        // Save the currently open accordion title before resetting
                         const openAccordion = document.querySelector('.class-group.active .class-title');
                         const openClassTitle = openAccordion ? openAccordion.innerText : null;
 
@@ -458,7 +464,6 @@
                             if(students.length > 0) openStudentProfile(students[0].id);
                         } else {
                             renderStudents(); 
-                            // Restore the open accordion state
                             if (openClassTitle) {
                                 document.querySelectorAll('.class-title').forEach(el => {
                                     if (el.innerText === openClassTitle) {
@@ -466,7 +471,6 @@
                                     }
                                 });
                             }
-                            // Restore the open profile if we were viewing one
                             if (currentViewedStudent && document.getElementById('view-profile').classList.contains('active')) {
                                 openStudentProfile(currentViewedStudent.id);
                             }
@@ -490,7 +494,8 @@
             document.getElementById('profMobile').innerText = s.mobile; document.getElementById('profAddress').innerText = s.address || 'N/A';
             document.getElementById('profFee').innerText = "₹" + s.fee;
 
-            const avatarContent = (s.image && s.image.startsWith('http')) ? `<img src="${s.image}">` : (s.gender === 'Female' ? femaleSVG : maleSVG);
+            // Added referrerpolicy="no-referrer" so Google Drive images render properly
+            const avatarContent = (s.image && s.image.startsWith('http')) ? `<img src="${s.image}" referrerpolicy="no-referrer">` : (s.gender === 'Female' ? femaleSVG : maleSVG);
             document.getElementById('profAvatar').innerHTML = avatarContent;
             switchProfileTab('overview'); switchTab('profile');
         }
@@ -523,7 +528,8 @@
                 
                 let cardsHtml = '<div class="class-content"><div class="student-grid">';
                 grouped[className].forEach(s => {
-                    const avatarContent = (s.image && s.image.startsWith('http')) ? `<img src="${s.image}">` : (s.gender === 'Female' ? femaleSVG : maleSVG);
+                    // Added referrerpolicy="no-referrer" so Google Drive images render properly
+                    const avatarContent = (s.image && s.image.startsWith('http')) ? `<img src="${s.image}" referrerpolicy="no-referrer">` : (s.gender === 'Female' ? femaleSVG : maleSVG);
                     const cycleString = getCurrentBillingCycle(s.joinDate);
                     const isDue = Math.random() > 0.5; const cycleStatus = isDue ? `Pending: ${cycleString}` : `Fee Paid: ${cycleString}`;
                     const feeBadge = isDue ? `<span class="s-fee-badge s-fee-due">${cycleStatus}</span>` : `<span class="s-fee-badge">${cycleStatus}</span>`;
@@ -560,8 +566,15 @@
         function openStudentModal() {
             studentModalMode = 'add';
             document.getElementById('modalTitle').innerText = "Add New Student"; 
-            document.getElementById('statusGroup').style.display = 'none';
             document.getElementById('saveStudentBtn').innerText = "Save Student";
+            
+            document.getElementById('formRow1').style.display = 'flex';
+            document.getElementById('formRow2').style.display = 'flex';
+            document.getElementById('formRow3').style.display = 'flex';
+            document.getElementById('stuSchool').parentElement.style.display = 'block';
+            document.getElementById('stuAddress').parentElement.style.display = 'block';
+            document.getElementById('statusGroup').style.display = 'none';
+            document.getElementById('stuPasswordGroup').style.display = 'none';
             
             ['stuName','stuClass','stuFee','stuJoinDate','stuMobile','stuSchool','stuAddress'].forEach(id => document.getElementById(id).value = '');
             document.getElementById('stuGender').value = 'Male'; 
@@ -575,22 +588,43 @@
         function openEditStudentModal() {
             if (!currentViewedStudent) return;
             studentModalMode = 'edit';
-            document.getElementById('modalTitle').innerText = "Edit Student Profile";
-            document.getElementById('statusGroup').style.display = 'block';
-            document.getElementById('saveStudentBtn').innerText = "Update Student";
+            document.getElementById('saveStudentBtn').innerText = "Update Profile";
 
+            // STUDENT ROLE LOGIC: Hide all fields except Profile Image and New Password
+            if (sessionRole === 'Student') {
+                document.getElementById('modalTitle').innerText = "Edit My Profile";
+                document.getElementById('formRow1').style.display = 'none';
+                document.getElementById('formRow2').style.display = 'none';
+                document.getElementById('formRow3').style.display = 'none';
+                document.getElementById('stuSchool').parentElement.style.display = 'none';
+                document.getElementById('stuAddress').parentElement.style.display = 'none';
+                document.getElementById('statusGroup').style.display = 'none';
+                
+                document.getElementById('stuPasswordGroup').style.display = 'block';
+                document.getElementById('stuPassword').value = '';
+            } else {
+                // Admin sees all fields
+                document.getElementById('modalTitle').innerText = "Edit Student Profile";
+                document.getElementById('formRow1').style.display = 'flex';
+                document.getElementById('formRow2').style.display = 'flex';
+                document.getElementById('formRow3').style.display = 'flex';
+                document.getElementById('stuSchool').parentElement.style.display = 'block';
+                document.getElementById('stuAddress').parentElement.style.display = 'block';
+                document.getElementById('statusGroup').style.display = 'block';
+                document.getElementById('stuPasswordGroup').style.display = 'none';
+            }
+
+            // Always populate hidden inputs so they aren't erased on save
             document.getElementById('stuName').value = currentViewedStudent.name || '';
             document.getElementById('stuGender').value = currentViewedStudent.gender || 'Male';
             document.getElementById('stuClass').value = currentViewedStudent.class || '';
             document.getElementById('stuFee').value = currentViewedStudent.fee || '';
-            
             let dateVal = '';
             if (currentViewedStudent.joinDate) {
                 const d = new Date(currentViewedStudent.joinDate);
                 if(!isNaN(d.getTime())) dateVal = d.toISOString().split('T')[0];
             }
             document.getElementById('stuJoinDate').value = dateVal;
-            
             document.getElementById('stuMobile').value = currentViewedStudent.mobile || '';
             document.getElementById('stuSchool').value = currentViewedStudent.school || '';
             document.getElementById('stuAddress').value = currentViewedStudent.address || '';
@@ -616,7 +650,6 @@
             const btn = document.getElementById('saveStudentBtn'); const originalText = btn.innerText;
             const previewSrc = document.getElementById('photoPreview').src; 
             
-            // Logic to determine if image is new (base64) or unchanged (http)
             let validImagePayload = "";
             if (previewSrc.startsWith('data:image')) { validImagePayload = previewSrc; } 
             else if (previewSrc.startsWith('http')) { validImagePayload = previewSrc; }
@@ -635,10 +668,15 @@
                 school: document.getElementById('stuSchool').value.trim(), 
                 address: document.getElementById('stuAddress').value.trim(),
                 status: document.getElementById('stuStatus').value || 'Active', 
-                image: validImagePayload 
+                image: validImagePayload,
+                newPassword: document.getElementById('stuPassword') ? document.getElementById('stuPassword').value.trim() : ""
             };
 
-            if (!payload.name || !payload.className || !payload.mobile || !payload.joinDate) { await showCustomAlert("Missing Fields", "Please fill in Name, Class, Mobile, and Join Date.", "error"); return; }
+            // Don't validate fields if Student is just updating photo/password
+            if (sessionRole !== 'Student' && (!payload.name || !payload.className || !payload.mobile || !payload.joinDate)) { 
+                await showCustomAlert("Missing Fields", "Please fill in Name, Class, Mobile, and Join Date.", "error"); return; 
+            }
+            
             btn.innerText = "Saving..."; btn.disabled = true;
 
             try {
@@ -684,34 +722,6 @@
             } catch (error) { await showCustomAlert("Network Error", "Failed to communicate with server.", "error"); }
         }
 
-        function fixBottomNav() {
-            const nav = document.querySelector('.app-nav');
-            if (!nav) return;
-            nav.style.display = 'none';
-            requestAnimationFrame(() => {
-                nav.offsetHeight;
-                nav.style.display = 'flex';
-            });
-        }
-
-        window.addEventListener('resize', fixBottomNav);
-        window.addEventListener('orientationchange', fixBottomNav);
-
-        document.addEventListener('visibilitychange', () => {
-            if (!document.hidden) fixBottomNav();
-        });
-        window.addEventListener('message', (event) => {
-            if (event.data && event.data.action === 'fixBottomNav') {
-                setTimeout(fixBottomNav, 100);
-                setTimeout(fixBottomNav, 300);
-                setTimeout(fixBottomNav, 600);
-            }
-        });
-
-        window.onload = () => {
-            fetchStudents();
-            setTimeout(fixBottomNav, 100);
-        };
     </script>
 </body>
 </html>
