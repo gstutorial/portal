@@ -17,30 +17,26 @@
             display: flex; flex-direction: column;
         }
 
-        /* --- BULLETPROOF FIXED BOTTOM NAV --- */
         .app-nav {
             display: flex; justify-content: space-around; background: rgba(15, 23, 42, 0.98);
             backdrop-filter: blur(10px); border-top: 1px solid rgba(255,255,255,0.05); 
             padding: 10px 10px calc(10px + env(safe-area-inset-bottom));
-            z-index: 9999; flex-shrink: 0; width: 100%;
+            z-index: 9999; flex-shrink: 0;
         }
         .nav-item { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; color: #94a3b8; cursor: pointer; padding: 0 12px; border-radius: 12px; transition: 0.3s; height: 50px; }
         .nav-item svg { width: 22px; height: 22px; }
         .nav-item span { font-size: 10px; font-weight: 700; }
         .nav-item.active { color: #38bdf8; background: rgba(56, 189, 248, 0.1); }
 
-        .view-container { flex: 1; position: relative; overflow: hidden; display: flex; flex-direction: column; }
-        
-        .view-section { display: none; height: 100%; animation: fadeIn 0.3s ease; flex-direction: column; padding: 16px; flex: 1; overflow: hidden; }
+        .view-container { flex: 1; position: relative; overflow: hidden; }
+        .view-section { display: none; height: 100%; animation: fadeIn 0.3s ease; flex-direction: column; padding: 16px; }
         .view-section.active { display: flex; }
 
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* --- UI COMPONENTS --- */
         .header-bar { display: flex; align-items: center; gap: 12px; margin-bottom: 15px; flex-shrink: 0; }
         .header-bar h2 { flex: 1; font-size: 20px; font-weight: 800; }
         
-        /* STRICT SCROLL LOCK: Keeps search bar fixed, only list scrolls */
         .fixed-top-area { flex-shrink: 0; display: flex; flex-direction: column; }
         .scrollable-list-area { flex: 1; overflow-y: auto; padding-bottom: 20px; padding-top: 5px; -webkit-overflow-scrolling: touch; }
         .scrollable-list-area::-webkit-scrollbar { width: 4px; }
@@ -62,7 +58,6 @@
         .segment-btn { flex: 1; text-align: center; padding: 10px; font-size: 13px; font-weight: 700; color: #94a3b8; border-radius: 10px; cursor: pointer; transition: 0.3s; }
         .segment-btn.active { background: rgba(255,255,255,0.1); color: white; box-shadow: 0 2px 10px rgba(0,0,0,0.2); }
 
-        /* --- CLASS GROUPING --- */
         .class-group { margin-bottom: 15px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; overflow: hidden; }
         .class-header { display: flex; align-items: center; gap: 12px; padding: 15px; cursor: pointer; user-select: none; transition: 0.2s; }
         .class-header:hover { background: rgba(255,255,255,0.05); }
@@ -74,7 +69,6 @@
         .class-content { display: none; padding: 0 12px 15px 12px; border-top: 1px solid rgba(255,255,255,0.05); margin-top: 5px; padding-top: 15px; }
         .class-group.active .class-content { display: block; animation: slideDown 0.3s ease; }
 
-        /* --- STUDENT CARDS --- */
         .student-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; }
         .student-card { background: linear-gradient(135deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));  border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 15px; display: flex; flex-direction: row; gap: 15px; align-items: center; cursor: pointer; transition: 0.2s; }
         .s-avatar { width: 55px; height: 55px; border-radius: 50%; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; flex-shrink: 0; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); }
@@ -89,7 +83,6 @@
         .icon-wa { color: #4ade80; }
         .icon-call { color: #38bdf8; }
 
-        /* --- BROWSER-STYLE PROFILE TABS --- */
         .profile-header { display:flex; align-items:center; gap:15px; padding-bottom:10px; margin-bottom:10px; flex-shrink: 0;}
         .p-avatar { width: 70px; height: 70px; border-radius: 50%; overflow: hidden; border: 2px solid rgba(255,255,255,0.2); flex-shrink: 0;}
         .p-avatar img, .p-avatar svg { width: 100%; height: 100%; object-fit: cover; }
@@ -109,7 +102,6 @@
         .p-data-row { display: flex; justify-content: space-between; padding: 8px 0; font-size: 14px; }
         .p-data-label { color: #94a3b8; }
 
-        /* --- POPUPS / MODALS --- */
         .custom-dialog-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); backdrop-filter: blur(8px); display: none; justify-content: center; align-items: center; z-index: 10000; padding: 20px; }
         .custom-dialog { background: #1e293b; border-radius: 20px; padding: 25px; width: 100%; max-width: 320px; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.6); animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         @keyframes popIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
@@ -149,36 +141,29 @@
     <div class="view-container">
         
         <div id="view-students" class="view-section active">
-            
             <div class="fixed-top-area">
                 <div class="header-bar">
                     <h2>Directory</h2>
                     <button class="btn btn-primary" id="addStudentBtn" onclick="openStudentModal()" style="display: none;">+ Add Student</button>
                 </div>
-
                 <div class="segment-control" id="segmentControl" style="display: none;">
                     <div class="segment-btn active" id="tab-active" onclick="filterStudents('Active')">Active Students</div>
                     <div class="segment-btn" id="tab-inactive" onclick="filterStudents('Inactive')">Inactive / Left</div>
                 </div>
-
                 <div class="form-group" id="searchBarGroup" style="display: none;">
                     <input type="text" id="searchInput" class="form-control" placeholder="🔍 Search by name, phone, or class..." oninput="searchStudents()">
                 </div>
             </div>
-            
             <div class="scrollable-list-area" id="studentListContainer"></div>
         </div>
 
         <div id="view-profile" class="view-section">
-
             <div class="profile-action-buttons">
                 <button id="backProfileBtn" class="btn profile-btn back-profile-btn" onclick="switchTab('students', document.getElementById('navDir'))">← Back</button>
-                
                 <button class="btn profile-btn delete-profile-btn" id="adminDeleteBtn" onclick="deleteStudent()" style="display:none;">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
                     Delete
                 </button>
-
                 <button class="btn profile-btn edit-profile-btn" id="editProfileBtn" onclick="openEditStudentModal()" style="display:none;">
                     Edit Profile
                 </button>
@@ -227,7 +212,7 @@
     </div>
 
     <nav class="app-nav">
-        <div class="nav-item active" onclick="switchTab('students', this)" id="navDir">
+        <div class="nav-item active" onclick="handleNavDirClick(this)" id="navDir">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
             <span id="navDirText">Directory</span>
         </div>
@@ -271,7 +256,7 @@
             
             <div class="profile-upload-container">
                 <div class="profile-preview" onclick="document.getElementById('stuPhoto').click()">
-                    <img id="photoPreview" src="" style="display:none;">
+                    <img id="photoPreview" src="" style="display:none;" referrerpolicy="no-referrer">
                     <svg id="photoPlaceholder" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
                 </div>
                 <span class="upload-text" onclick="document.getElementById('stuPhoto').click()">+ Upload Profile Photo</span>
@@ -327,6 +312,26 @@
         const sessionRole = localStorage.getItem('gs_role'); 
         const API_URL = GS_CONFIG.API_URL;
 
+        // --- SAFE DATE FORMATTER FIX ---
+        function safeFormatDate(dateStr) {
+            if (!dateStr) return 'N/A';
+            const d = new Date(dateStr);
+            if (isNaN(d.getTime())) return 'N/A';
+            return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+        }
+
+        function getCurrentBillingCycle(joinDateString) {
+            if (!joinDateString) return 'N/A';
+            const joinDate = new Date(joinDateString); 
+            if (isNaN(joinDate.getTime())) return 'N/A';
+            const today = new Date(); 
+            let cycleStartMonth = today.getMonth(); let cycleStartYear = today.getFullYear();
+            if (today.getDate() < joinDate.getDate()) { cycleStartMonth--; if (cycleStartMonth < 0) { cycleStartMonth = 11; cycleStartYear--; } }
+            const startDate = new Date(cycleStartYear, cycleStartMonth, joinDate.getDate());
+            const endDate = new Date(cycleStartYear, cycleStartMonth + 1, joinDate.getDate() - 1);
+            return `${startDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })} to ${endDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}`;
+        }
+
         function showCustomAlert(title, message, type='success') {
             return new Promise((resolve) => {
                 const overlay = document.getElementById('customDialogOverlay');
@@ -360,6 +365,15 @@
             document.getElementById('view-' + viewId).classList.add('active');
         }
 
+        // --- FIXED STUDENT NAVIGATION ---
+        function handleNavDirClick(element) {
+            if (sessionRole === 'Student') {
+                switchTab('profile', element);
+            } else {
+                switchTab('students', element);
+            }
+        }
+
         const profileTabsArray = ['overview', 'p-attendance', 'p-fees', 'p-exams'];
         let currentProfileTabIndex = 0;
 
@@ -389,31 +403,13 @@
             group.classList.toggle('active');
         }
 
-        function getCurrentBillingCycle(joinDateString) {
-            const joinDate = new Date(joinDateString); const today = new Date(); 
-            let cycleStartMonth = today.getMonth(); let cycleStartYear = today.getFullYear();
-            if (today.getDate() < joinDate.getDate()) { cycleStartMonth--; if (cycleStartMonth < 0) { cycleStartMonth = 11; cycleStartYear--; } }
-            const startDate = new Date(cycleStartYear, cycleStartMonth, joinDate.getDate());
-            const endDate = new Date(cycleStartYear, cycleStartMonth + 1, joinDate.getDate() - 1);
-            return `${startDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })} to ${endDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}`;
-        }
-
-        // ==========================================
-        // INSTANT LOAD CACHE + SMART BACKGROUND REFRESH
-        // ==========================================
         async function fetchStudents(forceNetwork = false) {
             const container = document.getElementById('studentListContainer');
             
-            // Apply UI Security Rules Instantly
             if (sessionRole === 'Student') {
-                const addBtn = document.getElementById('addStudentBtn');
-                const backBtn = document.getElementById('backProfileBtn');
-                const adminDeleteBtn = document.getElementById('adminDeleteBtn');
-
-                if (addBtn) addBtn.style.display = 'none';
-                if (backBtn) backBtn.style.display = 'none';
-                if (adminDeleteBtn) adminDeleteBtn.style.display = 'none';
-
+                document.getElementById('addStudentBtn').style.display = 'none';
+                document.getElementById('backProfileBtn').style.display = 'none';
+                document.getElementById('adminDeleteBtn').style.display = 'none';
                 document.getElementById('segmentControl').style.display = 'none';
                 document.getElementById('searchBarGroup').style.display = 'none';
                 document.getElementById('navDirText').innerText = 'My Profile';
@@ -427,7 +423,6 @@
                 document.getElementById('backProfileBtn').style.display = 'flex';
             }
 
-            // 1. Instant Load from Cache
             if (!forceNetwork) {
                 const cached = sessionStorage.getItem('gs_pref_students');
                 if (cached) {
@@ -441,7 +436,6 @@
                 }
             }
 
-            // 2. Silently fetch fresh data
             try {
                 const payload = { action: 'get_students', username: sessionUser, token: sessionToken, adminUsername: sessionUser, adminToken: sessionToken };
                 const response = await fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) });
@@ -451,9 +445,7 @@
                     const oldStudentsStr = JSON.stringify(students);
                     const newStudentsStr = JSON.stringify(result.students);
                     
-                    // SMART DIFF: Only re-render if the database actually changed OR if cache was empty
                     if (students.length === 0 || oldStudentsStr !== newStudentsStr) {
-                        
                         const openAccordion = document.querySelector('.class-group.active .class-title');
                         const openClassTitle = openAccordion ? openAccordion.innerText : null;
 
@@ -466,9 +458,7 @@
                             renderStudents(); 
                             if (openClassTitle) {
                                 document.querySelectorAll('.class-title').forEach(el => {
-                                    if (el.innerText === openClassTitle) {
-                                        el.closest('.class-group').classList.add('active');
-                                    }
+                                    if (el.innerText === openClassTitle) el.closest('.class-group').classList.add('active');
                                 });
                             }
                             if (currentViewedStudent && document.getElementById('view-profile').classList.contains('active')) {
@@ -481,23 +471,32 @@
                 }
             } catch (error) { 
                 if (forceNetwork || !sessionStorage.getItem('gs_pref_students')) {
-                    container.innerHTML = '<div style="text-align:center; color: #ef4444;">Network connection failed.</div>'; 
+                    container.innerHTML = `<div style="text-align:center; color: #ef4444; padding:15px; border:1px solid red; border-radius:10px;">Network failed: ${error.message}</div>`; 
                 }
             }
         }
 
         function openStudentProfile(studentId) {
             const s = students.find(x => x.id === studentId); if(!s) return; currentViewedStudent = s;
-            document.getElementById('profName').innerText = s.name; document.getElementById('profId').innerText = "ID: " + s.id;
-            document.getElementById('profClass').innerText = s.class; document.getElementById('profSchool').innerText = s.school || 'N/A';
-            document.getElementById('profJoined').innerText = new Date(s.joinDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
-            document.getElementById('profMobile').innerText = s.mobile; document.getElementById('profAddress').innerText = s.address || 'N/A';
-            document.getElementById('profFee').innerText = "₹" + s.fee;
+            document.getElementById('profName').innerText = s.name; 
+            document.getElementById('profId').innerText = "ID: " + s.id;
+            document.getElementById('profClass').innerText = s.class || 'N/A'; 
+            document.getElementById('profSchool').innerText = s.school || 'N/A';
+            document.getElementById('profJoined').innerText = safeFormatDate(s.joinDate);
+            document.getElementById('profMobile').innerText = s.mobile || 'N/A'; 
+            document.getElementById('profAddress').innerText = s.address || 'N/A';
+            document.getElementById('profFee').innerText = s.fee ? "₹" + s.fee : 'N/A';
 
-            // Added referrerpolicy="no-referrer" so Google Drive images render properly
             const avatarContent = (s.image && s.image.startsWith('http')) ? `<img src="${s.image}" referrerpolicy="no-referrer">` : (s.gender === 'Female' ? femaleSVG : maleSVG);
             document.getElementById('profAvatar').innerHTML = avatarContent;
-            switchProfileTab('overview'); switchTab('profile');
+            
+            switchProfileTab('overview'); 
+            
+            if (sessionRole === 'Student') {
+                switchTab('profile', document.getElementById('navDir'));
+            } else {
+                switchTab('profile');
+            }
         }
 
         function renderStudents() {
@@ -506,9 +505,9 @@
 
             const filtered = students.filter(s => {
                 const matchesStatus = s.status === currentFilter;
-                const safeName = (s.name || "").toString().toLowerCase();
-                const safeClass = (s.class || "").toString().toLowerCase();
-                const safeMobile = (s.mobile || "").toString();
+                const safeName = String(s.name || "").toLowerCase();
+                const safeClass = String(s.class || "").toLowerCase();
+                const safeMobile = String(s.mobile || "");
                 const matchesSearch = safeName.includes(searchQuery) || safeClass.includes(searchQuery) || safeMobile.includes(searchQuery);
                 return matchesStatus && matchesSearch;
             });
@@ -516,9 +515,12 @@
             if(filtered.length === 0) { container.innerHTML = `<p style="color:#94a3b8; text-align: center; margin-top: 30px;">No students found.</p>`; return; }
 
             const grouped = {};
-            filtered.forEach(s => { if (!grouped[s.class]) grouped[s.class] = []; grouped[s.class].push(s); });
+            filtered.forEach(s => { 
+                const safeClass = String(s.class || 'Unassigned');
+                if (!grouped[safeClass]) grouped[safeClass] = []; 
+                grouped[safeClass].push(s); 
+            });
 
-            // Classes are collapsed by default
             for (const className in grouped) {
                 const groupDiv = document.createElement('div'); groupDiv.className = `class-group`;
                 const classNum = className.match(/\d+/) ? className.match(/\d+/)[0] : className.charAt(0);
@@ -528,14 +530,13 @@
                 
                 let cardsHtml = '<div class="class-content"><div class="student-grid">';
                 grouped[className].forEach(s => {
-                    // Added referrerpolicy="no-referrer" so Google Drive images render properly
                     const avatarContent = (s.image && s.image.startsWith('http')) ? `<img src="${s.image}" referrerpolicy="no-referrer">` : (s.gender === 'Female' ? femaleSVG : maleSVG);
                     const cycleString = getCurrentBillingCycle(s.joinDate);
                     const isDue = Math.random() > 0.5; const cycleStatus = isDue ? `Pending: ${cycleString}` : `Fee Paid: ${cycleString}`;
                     const feeBadge = isDue ? `<span class="s-fee-badge s-fee-due">${cycleStatus}</span>` : `<span class="s-fee-badge">${cycleStatus}</span>`;
                     const statusBadge = currentFilter === 'Active' ? feeBadge : `<span class="s-fee-badge" style="color:#94a3b8; border-color: rgba(255,255,255,0.2); background: transparent;">Account Closed</span>`;
 
-                    cardsHtml += `<div class="student-card" onclick="openStudentProfile('${s.id}')"><div class="s-avatar">${avatarContent}</div><div class="s-info"><div class="s-name">${s.name}</div><div class="s-details"><span>Joined: ${new Date(s.joinDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</span></div>${statusBadge}</div><div class="s-actions"><a href="https://wa.me/91${s.mobile}" target="_blank" onclick="event.stopPropagation()" class="action-icon icon-wa" title="WhatsApp">${waSVG}</a><a href="tel:+91${s.mobile}" onclick="event.stopPropagation()" class="action-icon icon-call" title="Call">${phoneSVG}</a></div></div>`;
+                    cardsHtml += `<div class="student-card" onclick="openStudentProfile('${s.id}')"><div class="s-avatar">${avatarContent}</div><div class="s-info"><div class="s-name">${s.name}</div><div class="s-details"><span>Joined: ${safeFormatDate(s.joinDate)}</span></div>${statusBadge}</div><div class="s-actions"><a href="https://wa.me/91${s.mobile}" target="_blank" onclick="event.stopPropagation()" class="action-icon icon-wa" title="WhatsApp">${waSVG}</a><a href="tel:+91${s.mobile}" onclick="event.stopPropagation()" class="action-icon icon-call" title="Call">${phoneSVG}</a></div></div>`;
                 });
                 cardsHtml += '</div></div>'; groupDiv.innerHTML = classHeader + cardsHtml; container.appendChild(groupDiv);
             }
@@ -590,7 +591,6 @@
             studentModalMode = 'edit';
             document.getElementById('saveStudentBtn').innerText = "Update Profile";
 
-            // STUDENT ROLE LOGIC: Hide all fields except Profile Image and New Password
             if (sessionRole === 'Student') {
                 document.getElementById('modalTitle').innerText = "Edit My Profile";
                 document.getElementById('formRow1').style.display = 'none';
@@ -603,7 +603,6 @@
                 document.getElementById('stuPasswordGroup').style.display = 'block';
                 document.getElementById('stuPassword').value = '';
             } else {
-                // Admin sees all fields
                 document.getElementById('modalTitle').innerText = "Edit Student Profile";
                 document.getElementById('formRow1').style.display = 'flex';
                 document.getElementById('formRow2').style.display = 'flex';
@@ -614,17 +613,18 @@
                 document.getElementById('stuPasswordGroup').style.display = 'none';
             }
 
-            // Always populate hidden inputs so they aren't erased on save
             document.getElementById('stuName').value = currentViewedStudent.name || '';
             document.getElementById('stuGender').value = currentViewedStudent.gender || 'Male';
             document.getElementById('stuClass').value = currentViewedStudent.class || '';
             document.getElementById('stuFee').value = currentViewedStudent.fee || '';
+            
             let dateVal = '';
             if (currentViewedStudent.joinDate) {
                 const d = new Date(currentViewedStudent.joinDate);
                 if(!isNaN(d.getTime())) dateVal = d.toISOString().split('T')[0];
             }
             document.getElementById('stuJoinDate').value = dateVal;
+            
             document.getElementById('stuMobile').value = currentViewedStudent.mobile || '';
             document.getElementById('stuSchool').value = currentViewedStudent.school || '';
             document.getElementById('stuAddress').value = currentViewedStudent.address || '';
@@ -672,7 +672,6 @@
                 newPassword: document.getElementById('stuPassword') ? document.getElementById('stuPassword').value.trim() : ""
             };
 
-            // Don't validate fields if Student is just updating photo/password
             if (sessionRole !== 'Student' && (!payload.name || !payload.className || !payload.mobile || !payload.joinDate)) { 
                 await showCustomAlert("Missing Fields", "Please fill in Name, Class, Mobile, and Join Date.", "error"); return; 
             }
@@ -714,7 +713,6 @@
                 if (result.status === 'success') { 
                     await showCustomAlert("Deleted", result.message, "success"); 
                     switchTab('students', document.getElementById('navDir')); 
-                    
                     try { window.parent.postMessage({ action: 'refreshCache' }, '*'); } catch(e){}
                     fetchStudents(true); 
                 } 
@@ -722,6 +720,30 @@
             } catch (error) { await showCustomAlert("Network Error", "Failed to communicate with server.", "error"); }
         }
 
+        function fixBottomNav() {
+            const nav = document.querySelector('.app-nav');
+            if (!nav) return;
+            nav.style.display = 'none';
+            requestAnimationFrame(() => {
+                nav.offsetHeight;
+                nav.style.display = 'flex';
+            });
+        }
+
+        window.addEventListener('resize', fixBottomNav);
+        window.addEventListener('orientationchange', fixBottomNav);
+
+        document.addEventListener('visibilitychange', () => { if (!document.hidden) fixBottomNav(); });
+        window.addEventListener('message', (event) => {
+            if (event.data && event.data.action === 'fixBottomNav') {
+                setTimeout(fixBottomNav, 100); setTimeout(fixBottomNav, 300); setTimeout(fixBottomNav, 600);
+            }
+        });
+
+        window.onload = () => {
+            fetchStudents();
+            setTimeout(fixBottomNav, 100);
+        };
     </script>
 </body>
 </html>
