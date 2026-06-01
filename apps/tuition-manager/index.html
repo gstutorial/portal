@@ -43,15 +43,14 @@
         /* STRICT SCROLL LOCK: Keeps search bar fixed, only list scrolls */
         .fixed-top-area { flex-shrink: 0; display: flex; flex-direction: column; }
         .scrollable-list-area { flex: 1; overflow-y: auto; padding-bottom: 20px; padding-top: 5px; -webkit-overflow-scrolling: touch; }
-        /* Hide scrollbar for cleaner look */
         .scrollable-list-area::-webkit-scrollbar { width: 4px; }
         .scrollable-list-area::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
 
         .profile-action-buttons { display:flex; gap:8px; margin-bottom:24px; align-items:center; }
-        .profile-btn { flex:1; height:44px; min-height:44px; display:flex; align-items:center; justify-content:center; gap:6px; font-size:14px; font-weight:700; border-radius:12px; padding:0 12px; }
-        .back-profile-btn { background:rgba(255,255,255,0.08); }
-        .delete-profile-btn { background:#dc2626; color:white; border:none; box-shadow:0 4px 12px rgba(220,38,38,.35); }
-        .edit-profile-btn { background:#3b82f6; }
+        .profile-btn { flex:1; height:44px; min-height:44px; display:flex; align-items:center; justify-content:center; gap:6px; font-size:14px; font-weight:700; border-radius:12px; padding:0 12px; cursor: pointer; border: none; }
+        .back-profile-btn { background:rgba(255,255,255,0.08); color: white; }
+        .delete-profile-btn { background:#dc2626; color:white; box-shadow:0 4px 12px rgba(220,38,38,.35); }
+        .edit-profile-btn { background:#3b82f6; color: white; }
         
         .btn { border: none; border-radius: 12px; padding: 10px 15px; font-size: 13px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; color: white; transition: 0.2s; }
         .btn:active { transform: scale(0.95); }
@@ -180,7 +179,7 @@
                     Delete
                 </button>
 
-                <button class="btn profile-btn edit-profile-btn" id="editProfileBtn" onclick="showCustomAlert('Coming Soon', 'Edit Profile logic will be added next.')" style="display:none;">
+                <button class="btn profile-btn edit-profile-btn" id="editProfileBtn" onclick="openEditStudentModal()" style="display:none;">
                     Edit Profile
                 </button>
             </div>
@@ -316,6 +315,7 @@
         const phoneSVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>`;
 
         let students = []; let currentFilter = 'Active'; let currentViewedStudent = null; let cropper; 
+        let studentModalMode = 'add'; 
         
         const sessionToken = localStorage.getItem('gs_token'); 
         const sessionUser = localStorage.getItem('gs_username'); 
@@ -394,7 +394,7 @@
         }
 
         // ==========================================
-        // INSTANT LOAD CACHE + BACKGROUND REFRESH
+        // INSTANT LOAD CACHE + SMART BACKGROUND REFRESH
         // ==========================================
         async function fetchStudents(forceNetwork = false) {
             const container = document.getElementById('studentListContainer');
@@ -409,11 +409,11 @@
                 document.getElementById('searchBarGroup').style.display = 'none';
                 document.getElementById('navDirText').innerText = 'My Profile';
             } else {
-                document.getElementById('addStudentBtn').style.display = 'flex';
+                document.getElementById('addStudentBtn').style.display = 'block';
                 document.getElementById('segmentControl').style.display = 'flex';
                 document.getElementById('searchBarGroup').style.display = 'block';
                 document.getElementById('adminDeleteBtn').style.display = 'block';
-                document.getElementById('editProfileBtn').style.display = 'flex';
+                document.getElementById('editProfileBtn').style.display = 'block';
             }
 
             // 1. Instant Load from Cache
@@ -430,20 +430,43 @@
                 }
             }
 
-            // 2. Silently fetch fresh data
+            // 2. Silently fetch fresh data (with Smart Diff)
             try {
                 const payload = { action: 'get_students', username: sessionUser, token: sessionToken, adminUsername: sessionUser, adminToken: sessionToken };
                 const response = await fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) });
                 const result = await response.json();
                 
                 if (result.status === 'success') { 
-                    students = result.students; 
-                    sessionStorage.setItem('gs_pref_students', JSON.stringify(students));
+                    const oldStudentsStr = JSON.stringify(students);
+                    const newStudentsStr = JSON.stringify(result.students);
                     
-                    if (sessionRole === 'Student') {
-                        if(students.length > 0) openStudentProfile(students[0].id);
-                    } else {
-                        renderStudents(); 
+                    // SMART DIFF: Only re-render if the database actually changed! Prevents accordion collapsing.
+                    if (oldStudentsStr !== newStudentsStr) {
+                        
+                        // Save the currently open accordion title before resetting
+                        const openAccordion = document.querySelector('.class-group.active .class-title');
+                        const openClassTitle = openAccordion ? openAccordion.innerText : null;
+
+                        students = result.students; 
+                        sessionStorage.setItem('gs_pref_students', JSON.stringify(students));
+                        
+                        if (sessionRole === 'Student') {
+                            if(students.length > 0) openStudentProfile(students[0].id);
+                        } else {
+                            renderStudents(); 
+                            // Restore the open accordion state
+                            if (openClassTitle) {
+                                document.querySelectorAll('.class-title').forEach(el => {
+                                    if (el.innerText === openClassTitle) {
+                                        el.closest('.class-group').classList.add('active');
+                                    }
+                                });
+                            }
+                            // Restore the open profile if we were viewing one
+                            if (currentViewedStudent && document.getElementById('view-profile').classList.contains('active')) {
+                                openStudentProfile(currentViewedStudent.id);
+                            }
+                        }
                     }
                 } else if (forceNetwork || !sessionStorage.getItem('gs_pref_students')) { 
                     container.innerHTML = `<div style="text-align:center; color: #ef4444;">Error: ${result.message}</div>`; 
@@ -531,24 +554,84 @@
         }
 
         function openStudentModal() {
-            document.getElementById('modalTitle').innerText = "Add New Student"; document.getElementById('statusGroup').style.display = 'none';
+            studentModalMode = 'add';
+            document.getElementById('modalTitle').innerText = "Add New Student"; 
+            document.getElementById('statusGroup').style.display = 'none';
+            document.getElementById('saveStudentBtn').innerText = "Save Student";
+            
             ['stuName','stuClass','stuFee','stuJoinDate','stuMobile','stuSchool','stuAddress'].forEach(id => document.getElementById(id).value = '');
-            document.getElementById('stuGender').value = 'Male'; document.getElementById('photoPreview').src = ''; document.getElementById('photoPreview').style.display = 'none'; document.getElementById('photoPlaceholder').style.display = 'block'; document.getElementById('stuPhoto').value = '';
+            document.getElementById('stuGender').value = 'Male'; 
+            document.getElementById('stuStatus').value = 'Active'; 
+            
+            document.getElementById('photoPreview').src = ''; document.getElementById('photoPreview').style.display = 'none'; 
+            document.getElementById('photoPlaceholder').style.display = 'block'; document.getElementById('stuPhoto').value = '';
             document.getElementById('studentModal').style.display = 'flex';
         }
+
+        function openEditStudentModal() {
+            if (!currentViewedStudent) return;
+            studentModalMode = 'edit';
+            document.getElementById('modalTitle').innerText = "Edit Student Profile";
+            document.getElementById('statusGroup').style.display = 'block';
+            document.getElementById('saveStudentBtn').innerText = "Update Student";
+
+            document.getElementById('stuName').value = currentViewedStudent.name || '';
+            document.getElementById('stuGender').value = currentViewedStudent.gender || 'Male';
+            document.getElementById('stuClass').value = currentViewedStudent.class || '';
+            document.getElementById('stuFee').value = currentViewedStudent.fee || '';
+            
+            let dateVal = '';
+            if (currentViewedStudent.joinDate) {
+                const d = new Date(currentViewedStudent.joinDate);
+                if(!isNaN(d.getTime())) dateVal = d.toISOString().split('T')[0];
+            }
+            document.getElementById('stuJoinDate').value = dateVal;
+            
+            document.getElementById('stuMobile').value = currentViewedStudent.mobile || '';
+            document.getElementById('stuSchool').value = currentViewedStudent.school || '';
+            document.getElementById('stuAddress').value = currentViewedStudent.address || '';
+            document.getElementById('stuStatus').value = currentViewedStudent.status || 'Active';
+
+            if (currentViewedStudent.image && currentViewedStudent.image.startsWith('http')) {
+                document.getElementById('photoPreview').src = currentViewedStudent.image;
+                document.getElementById('photoPreview').style.display = 'block';
+                document.getElementById('photoPlaceholder').style.display = 'none';
+            } else {
+                document.getElementById('photoPreview').src = '';
+                document.getElementById('photoPreview').style.display = 'none';
+                document.getElementById('photoPlaceholder').style.display = 'block';
+            }
+            
+            document.getElementById('stuPhoto').value = '';
+            document.getElementById('studentModal').style.display = 'flex';
+        }
+
         function closeStudentModal() { document.getElementById('studentModal').style.display = 'none'; }
 
         async function saveStudent() {
             const btn = document.getElementById('saveStudentBtn'); const originalText = btn.innerText;
-            const previewSrc = document.getElementById('photoPreview').src; const validImagePayload = previewSrc.startsWith('data:image') ? previewSrc : "";
+            const previewSrc = document.getElementById('photoPreview').src; 
+            
+            // Logic to determine if image is new (base64) or unchanged (http)
+            let validImagePayload = "";
+            if (previewSrc.startsWith('data:image')) { validImagePayload = previewSrc; } 
+            else if (previewSrc.startsWith('http')) { validImagePayload = previewSrc; }
 
             const payload = {
-                action: 'create_student', username: sessionUser, token: sessionToken, adminUsername: sessionUser, adminToken: sessionToken,
-                name: document.getElementById('stuName').value.trim(), gender: document.getElementById('stuGender').value,
-                className: document.getElementById('stuClass').value.trim(), fee: document.getElementById('stuFee').value,
-                joinDate: document.getElementById('stuJoinDate').value, mobile: document.getElementById('stuMobile').value.trim(),
-                school: document.getElementById('stuSchool').value.trim(), address: document.getElementById('stuAddress').value.trim(),
-                status: 'Active', image: validImagePayload 
+                action: studentModalMode === 'add' ? 'create_student' : 'update_student', 
+                username: sessionUser, token: sessionToken, adminUsername: sessionUser, adminToken: sessionToken,
+                studentId: studentModalMode === 'edit' ? currentViewedStudent.id : undefined,
+                oldMobile: studentModalMode === 'edit' ? currentViewedStudent.mobile : undefined,
+                name: document.getElementById('stuName').value.trim(), 
+                gender: document.getElementById('stuGender').value,
+                className: document.getElementById('stuClass').value.trim(), 
+                fee: document.getElementById('stuFee').value,
+                joinDate: document.getElementById('stuJoinDate').value, 
+                mobile: document.getElementById('stuMobile').value.trim(),
+                school: document.getElementById('stuSchool').value.trim(), 
+                address: document.getElementById('stuAddress').value.trim(),
+                status: document.getElementById('stuStatus').value || 'Active', 
+                image: validImagePayload 
             };
 
             if (!payload.name || !payload.className || !payload.mobile || !payload.joinDate) { await showCustomAlert("Missing Fields", "Please fill in Name, Class, Mobile, and Join Date.", "error"); return; }
@@ -562,8 +645,6 @@
                     if (result.status === 'success') { 
                         await showCustomAlert("Success", result.message, "success"); 
                         closeStudentModal(); 
-                        
-                        // Signal dashboard cache update and force network fetch
                         try { window.parent.postMessage({ action: 'refreshCache' }, '*'); } catch(e){}
                         fetchStudents(true); 
                     } 
