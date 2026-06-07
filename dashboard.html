@@ -3,499 +3,392 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    
-    <title>G. S. Tutorial - Dashboard</title>
-
+    <title>G. S. Tutorial – Dashboard</title>
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="apple-touch-icon" href="logo.png">
-
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-
-        /* STRICT MOBILE LOCK: Uses 100dvh to map perfectly to mobile browser screens */
-        html, body {
-            font-family: Arial, sans-serif;
-            background: radial-gradient(circle at top, #1e3a8a 0%, #0f172a 40%, #020617 100%);
-            height: 100vh; height: 100dvh; width: 100%; 
-            color: white; display: flex; flex-direction: column; overflow: hidden;
+        *{margin:0;padding:0;box-sizing:border-box}
+        html,body{
+            font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;
+            background:radial-gradient(circle at top,#1e3a8a 0%,#0f172a 40%,#020617 100%);
+            height:100%;width:100%;color:white;overflow:hidden;
         }
-
-        .app-container { display: flex; flex-direction: column; height: 100%; width: 100%; overflow: hidden; }
-
-        /* =========================================
-           MOBILE TOP HEADER (Dynamic)
-        ========================================= */
-        .mobile-header {
-            background: linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02));
-            backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255,255,255,0.1);
-            padding: 12px 15px; display: flex; justify-content: space-between; align-items: center;
-            flex-shrink: 0; z-index: 90; height: 60px;
+        /* ── LAYOUT ── */
+        .app-shell{display:flex;flex-direction:column;height:100dvh;width:100%;overflow:hidden}
+        /* ── MOBILE TOP HEADER ── */
+        .top-bar{
+            background:rgba(255,255,255,0.07);backdrop-filter:blur(20px);
+            border-bottom:1px solid rgba(255,255,255,0.09);
+            padding:0 15px;display:flex;justify-content:space-between;align-items:center;
+            flex-shrink:0;height:58px;z-index:90;
         }
-
-        .header-dashboard { display: flex; justify-content: space-between; align-items: center; width: 100%; }
-        
-        .hamburger-btn {
-            background: none; border: none; color: white; cursor: pointer; padding: 5px;
-            display: flex; align-items: center; justify-content: center;
+        .top-bar-left{display:flex;align-items:center;gap:10px}
+        .hamburger{background:none;border:none;color:white;cursor:pointer;padding:6px;display:flex;align-items:center;border-radius:8px;transition:.18s}
+        .hamburger:hover{background:rgba(255,255,255,.08)}
+        .brand{display:flex;align-items:center;gap:9px}
+        .brand-logo{width:30px;height:30px;object-fit:contain;border-radius:6px}
+        .brand-name{font-size:17px;font-weight:800;background:linear-gradient(135deg,#60a5fa,#38bdf8);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+        /* app-in-header state */
+        .top-bar-app{display:none;align-items:center;gap:10px;flex:1}
+        .back-pill{display:flex;align-items:center;gap:6px;background:rgba(56,189,248,.1);border:1px solid rgba(56,189,248,.3);color:#38bdf8;border-radius:10px;padding:6px 12px;font-size:13px;font-weight:700;cursor:pointer;transition:.18s}
+        .back-pill:hover{background:rgba(56,189,248,.18)}
+        .cur-app-info{display:flex;align-items:center;gap:7px;margin-left:auto}
+        .cur-app-icon{width:26px;height:26px;border-radius:7px;display:flex;align-items:center;justify-content:center}
+        .cur-app-name{font-size:14px;font-weight:700}
+        /* ── BODY (sidebar + arena) ── */
+        .body{display:flex;flex:1;overflow:hidden}
+        /* ── SIDEBAR ── */
+        .sidebar-mask{position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);z-index:99;opacity:0;pointer-events:none;transition:opacity .28s}
+        .sidebar-mask.open{opacity:1;pointer-events:auto}
+        .sidebar{
+            position:fixed;top:0;left:-290px;width:270px;height:100%;
+            background:linear-gradient(160deg,#0f172a,#020617);
+            border-right:1px solid rgba(255,255,255,.09);box-shadow:12px 0 30px rgba(0,0,0,.5);
+            padding:28px 20px;display:flex;flex-direction:column;z-index:100;
+            transition:left .3s cubic-bezier(.4,0,.2,1);
         }
-
-        .brand-info { display: flex; align-items: center; gap: 10px; }
-        .header-logo { width: 32px; height: 32px; object-fit: contain; }
-        .app-title-text {
-            font-size: 18px; font-weight: 800; letter-spacing: 0.5px;
-            background: linear-gradient(135deg, #60a5fa, #38bdf8);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        .sidebar.open{left:0}
+        .sb-brand{display:none;flex-direction:column;align-items:center;gap:10px;margin-bottom:28px}
+        .sb-brand img{width:65px;height:65px;object-fit:contain;border-radius:12px}
+        .user-card{
+            background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.09);
+            border-radius:16px;padding:14px;display:flex;gap:11px;align-items:flex-start;margin-bottom:28px;
         }
-
-        .header-app { display: none; justify-content: space-between; align-items: center; width: 100%; }
-        
-        .back-btn {
-            background: rgba(56, 189, 248, 0.1); border: 1px solid rgba(56, 189, 248, 0.3);
-            color: #38bdf8; border-radius: 10px; padding: 6px 12px; font-size: 14px; font-weight: 800;
-            display: flex; align-items: center; gap: 6px; cursor: pointer;
+        .u-avatar{width:44px;height:44px;background:linear-gradient(135deg,#2563eb,#06b6d4);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;flex-shrink:0}
+        .u-info{flex:1;min-width:0}
+        .u-name{font-size:14px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:1px}
+        .u-un{font-size:11px;color:#38bdf8;font-family:monospace;margin-bottom:5px}
+        .u-contact{font-size:10px;color:#64748b;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:6px}
+        .role-pill{display:inline-block;font-size:10px;padding:2px 8px;border-radius:7px;font-weight:700;background:rgba(37,99,235,.25);color:#60a5fa;border:1px solid rgba(37,99,235,.4)}
+        .role-pill.admin{background:rgba(220,38,38,.22);color:#f87171;border-color:rgba(220,38,38,.4)}
+        .sb-bottom{margin-top:auto;display:flex;flex-direction:column;gap:12px}
+        .logout-btn{
+            background:rgba(239,68,68,.13);color:#f87171;border:1px solid rgba(239,68,68,.28);
+            border-radius:12px;padding:11px;display:flex;align-items:center;justify-content:center;gap:8px;
+            cursor:pointer;font-weight:700;font-size:13px;transition:.2s;
         }
-
-        .current-app-info { display: flex; align-items: center; gap: 8px; }
-        .current-app-icon { width: 28px; height: 28px; border-radius: 8px; display: flex; align-items: center; justify-content: center; }
-        .current-app-icon svg { width: 16px; height: 16px; }
-        .current-app-name { font-size: 15px; font-weight: 700; color: white; }
-
-        /* =========================================
-           SIDEBAR / DRAWER MENU
-        ========================================= */
-        .sidebar-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.6); backdrop-filter: blur(4px);
-            z-index: 99; opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+        .logout-btn:hover{background:rgba(239,68,68,.85);color:white}
+        .creator{text-align:center;font-size:11px;color:#334155;font-weight:600}
+        /* ── MAIN ARENA ── */
+        .main-arena{flex:1;overflow-y:auto;overflow-x:hidden;padding:20px;-webkit-overflow-scrolling:touch}
+        .main-arena::-webkit-scrollbar{width:4px}
+        .main-arena::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:10px}
+        .section-label{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.6px;color:#64748b;margin-bottom:12px}
+        .app-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,290px),1fr));gap:14px;margin-bottom:30px}
+        .app-card{
+            background:linear-gradient(135deg,rgba(255,255,255,.07),rgba(255,255,255,.02));
+            border:1px solid rgba(255,255,255,.09);border-radius:18px;padding:18px;
+            cursor:pointer;transition:all .2s;display:flex;align-items:flex-start;gap:14px;
         }
-        .sidebar-overlay.active { opacity: 1; pointer-events: auto; }
-
-        .sidebar {
-            position: fixed; top: 0; left: -280px; width: 260px; height: 100%;
-            background: linear-gradient(135deg, #0f172a, #020617);
-            border-right: 1px solid rgba(255,255,255,0.1); box-shadow: 10px 0 30px rgba(0,0,0,0.5);
-            padding: 25px 20px; display: flex; flex-direction: column; z-index: 100;
-            transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .sidebar.active { left: 0; }
-
-        .sidebar-brand-desktop { display: none; } 
-
-        .user-profile {
-            width: 100%; background: rgba(255,255,255,0.05); padding: 15px; border-radius: 16px;
-            border: 1px solid rgba(255,255,255,0.1); display: flex; align-items: flex-start; gap: 12px; margin-bottom: 30px;
-        }
-        .avatar {
-            width: 45px; height: 45px; background: linear-gradient(135deg, #2563eb, #06b6d4);
-            border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            font-weight: bold; font-size: 18px; flex-shrink: 0;
-        }
-        
-        .user-info { flex: 1; min-width: 0; }
-        .user-fullname { font-size: 15px; font-weight: 800; color: white; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .username-tag { font-size: 11px; color: #38bdf8; font-family: monospace; margin-bottom: 6px; }
-        .user-contact { font-size: 11px; color: #94a3b8; margin-bottom: 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-
-        .role-badge {
-            font-size: 10px; padding: 3px 8px; border-radius: 8px; display: inline-block;
-            background: rgba(37,99,235,0.3); color: #60a5fa; border: 1px solid rgba(37,99,235,0.5);
-        }
-        .role-admin { background: rgba(220,38,38,0.3); color: #f87171; border-color: rgba(220,38,38,0.5); }
-
-        .nav-bottom { margin-top: auto; width: 100%; display: flex; flex-direction: column; gap: 15px; }
-
-        .logout-btn {
-            background: rgba(239,68,68,0.15); color: #f87171; border: 1px solid rgba(239,68,68,0.3);
-            border-radius: 14px; padding: 12px; display: flex; align-items: center; justify-content: center; gap: 8px;
-            cursor: pointer; transition: 0.3s; font-weight: bold; font-size: 14px; width: 100%;
-        }
-        .logout-btn:hover { background: rgba(239,68,68,0.8); color: white; }
-        
-        .creator-tag { text-align: center; font-size: 12px; color: #64748b; font-weight: 600; }
-
-        /* =========================================
-           MAIN ARENA & APPS
-        ========================================= */
-        .main-arena {
-            flex: 1; padding: 15px; display: flex; flex-direction: column; gap: 20px; 
-            overflow-y: auto; -webkit-overflow-scrolling: touch;
-        }
-
-        .section-title { font-size: 15px; font-weight: 800; margin-bottom: 10px; color: #e2e8f0; text-transform: uppercase; letter-spacing: 0.5px; }
-        .app-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 15px; margin-bottom: 25px; }
-
-        .app-card {
-            background: linear-gradient(135deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
-            border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; padding: 20px; cursor: pointer;
-            transition: transform 0.2s; display: flex; flex-direction: row; align-items: flex-start; gap: 15px;
-        }
-        .app-card:hover { transform: translateY(-3px); background: rgba(255,255,255,0.1); }
-
-        .app-icon { width: 50px; height: 50px; border-radius: 14px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
-        .app-details { display: flex; flex-direction: column; flex: 1; min-width: 0; }
-
-        .icon-blue { background: linear-gradient(135deg, #3b82f6, #2563eb); }
-        .icon-green { background: linear-gradient(135deg, #10b981, #059669); }
-        .icon-purple { background: linear-gradient(135deg, #8b5cf6, #6d28d9); }
-
-        .app-name { font-size: 16px; font-weight: 700; margin-bottom: 4px; color: white; }
-        .app-desc { font-size: 12px; color: #94a3b8; line-height: 1.4; margin-bottom: 10px; }
-        .permission-tags { display: flex; gap: 5px; flex-wrap: wrap; margin-top: auto; }
-        .perm-tag { font-size: 10px; padding: 4px 8px; border-radius: 6px; font-weight: bold; background: rgba(255,255,255,0.1); color: #cbd5e1; }
-
-        /* IFRAME VIEWER */
-        #appViewer {
-            display: none;
-            width: 100%;
-            height: calc(100dvh - 60px);
-            border: none;
-            background: transparent;
-            flex: none;
-        }
-        #dashboardContent { flex: 1; display: flex; flex-direction: column; gap: 25px; }
-
-        /* --- DESKTOP BACK BUTTON --- */
-        .desktop-back-nav { display: none !important; }
-
-        /* =========================================
-           DESKTOP OVERRIDES
-        ========================================= */
-        @media (min-width: 768px) {
-            .app-container { flex-direction: row; }
-            .mobile-header { display: none; } 
-            
-            .sidebar-overlay { display: none; }
-            .sidebar {
-                position: relative; left: 0; width: 280px; height: 100%;
-                background: linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.01));
-                border-right: 1px solid rgba(255,255,255,0.1); box-shadow: none;
-                backdrop-filter: blur(20px);
-            }
-
-            .sidebar-brand-desktop { display: flex; flex-direction: column; align-items: center; gap: 12px; margin-bottom: 30px; }
-            .sidebar-brand-desktop img { width: 70px; height: 70px; object-fit: contain; }
-
-            .main-arena { padding: 30px; gap: 30px; }
-            .section-title { font-size: 18px; }
-            .app-card { flex-direction: column; gap: 12px; padding: 25px; }
-            .app-icon { width: 60px; height: 60px; }
-            
-            .desktop-back-nav.active { 
-                display: flex !important; align-items: center; gap: 10px; cursor: pointer; 
-                font-size: 18px; font-weight: bold; color: #38bdf8; margin-bottom: 10px; 
-                padding: 15px; border-radius: 12px; background: rgba(56, 189, 248, 0.05); 
-                border: 1px solid rgba(56, 189, 248, 0.2); width: fit-content; 
-            }
-        }
-
-        .install-fab {
-            position: fixed; bottom: 20px; right: 20px; background: linear-gradient(135deg, #10b981, #059669); color: white;
-            border: none; border-radius: 50px; padding: 14px 24px; font-size: 15px; font-weight: 800; box-shadow: 0 5px 20px rgba(0,0,0,0.4);
-            cursor: pointer; z-index: 1000; display: none; align-items: center; gap: 8px;
+        .app-card:hover{transform:translateY(-3px);background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.15)}
+        .app-card:active{transform:scale(.97)}
+        .app-ico{width:50px;height:50px;border-radius:13px;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+        .ic-blue{background:linear-gradient(135deg,#3b82f6,#2563eb)}
+        .ic-green{background:linear-gradient(135deg,#10b981,#059669)}
+        .ic-purple{background:linear-gradient(135deg,#8b5cf6,#6d28d9)}
+        .ic-orange{background:linear-gradient(135deg,#f59e0b,#d97706)}
+        .app-det{flex:1;min-width:0}
+        .app-title{font-size:15px;font-weight:800;margin-bottom:4px}
+        .app-desc{font-size:12px;color:#64748b;line-height:1.45;margin-bottom:8px}
+        .perm-tags{display:flex;gap:5px;flex-wrap:wrap}
+        .perm-tag{font-size:10px;padding:3px 7px;border-radius:6px;font-weight:700;background:rgba(255,255,255,.08);color:#94a3b8}
+        /* ── DESKTOP BACK BUTTON ── */
+        .desk-back{display:none;align-items:center;gap:9px;cursor:pointer;font-size:16px;font-weight:700;color:#38bdf8;margin-bottom:16px;padding:12px 16px;border-radius:12px;background:rgba(56,189,248,.05);border:1px solid rgba(56,189,248,.18);width:fit-content;transition:.18s}
+        .desk-back:hover{background:rgba(56,189,248,.1)}
+        /* ── IFRAME ── */
+        #appViewer{display:none;border:none;background:transparent;flex-shrink:0}
+        /* ── INSTALL FAB ── */
+        .install-fab{position:fixed;bottom:20px;right:20px;background:linear-gradient(135deg,#10b981,#059669);color:white;border:none;border-radius:50px;padding:13px 22px;font-size:14px;font-weight:800;box-shadow:0 5px 20px rgba(0,0,0,.4);cursor:pointer;z-index:1000;display:none;align-items:center;gap:8px}
+        /* ── DESKTOP ── */
+        @media(min-width:768px){
+            .top-bar{display:none}
+            .body{flex-direction:row}
+            .sidebar-mask{display:none}
+            .sidebar{position:relative;left:0;width:280px;height:100%;box-shadow:none;background:linear-gradient(160deg,rgba(255,255,255,.045),rgba(255,255,255,.01));backdrop-filter:blur(20px);transition:none}
+            .sb-brand{display:flex}
+            .main-arena{padding:28px}
+            .app-card{flex-direction:column;gap:12px}
+            .app-ico{width:58px;height:58px}
+            .desk-back.visible{display:flex}
         }
     </style>
 </head>
 <body>
+<div class="app-shell">
 
-    <div class="app-container">
-        
-        <div class="mobile-header" id="mobileHeader">
-            <div class="header-dashboard" id="headerDashboard">
-                <button class="hamburger-btn" onclick="toggleSidebar()">
-                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
-                </button>
-                <div class="brand-info">
-                    <img src="logo.png" class="header-logo" onerror="this.style.display='none'">
-                    <span class="app-title-text">GS Portal</span>
-                </div>
-            </div>
-
-            <div class="header-app" id="headerApp">
-                <button class="back-btn" onclick="closeApp()">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
-                    Dashboard
-                </button>
-                <div class="current-app-info">
-                    <div class="current-app-icon" id="headerAppIcon"></div>
-                    <span class="current-app-name" id="headerAppName">App</span>
-                </div>
+    <!-- MOBILE TOP BAR -->
+    <header class="top-bar" id="topBar">
+        <div class="top-bar-left" id="topBarDash">
+            <button class="hamburger" onclick="toggleSidebar()">
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+            </button>
+            <div class="brand">
+                <img src="logo.png" class="brand-logo" onerror="this.style.display='none'">
+                <span class="brand-name">GS Portal</span>
             </div>
         </div>
-
-        <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
-        <div class="sidebar" id="sidebar">
-            
-            <div class="sidebar-brand-desktop">
-                <img src="logo.png" alt="GS Logo" onerror="this.style.display='none'">
-                <div class="app-title-text" style="font-size: 22px;">GS Portal</div>
+        <div class="top-bar-app" id="topBarApp">
+            <button class="back-pill" onclick="closeApp()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+                Dashboard
+            </button>
+            <div class="cur-app-info">
+                <div class="cur-app-icon" id="curAppIcon"></div>
+                <span class="cur-app-name" id="curAppName"></span>
             </div>
-            
-            <div class="user-profile">
-                <div class="avatar" id="userInitials">U</div>
-                <div class="user-info">
-                    <div class="user-fullname" id="displayFullName">Loading...</div>
-                    <div class="username-tag" id="displayUsername">@username</div>
-                    <div class="user-contact" id="displayContact">email • mobile</div>
-                    <div class="role-badge" id="displayRole">User</div>
+        </div>
+    </header>
+
+    <div class="body">
+        <!-- SIDEBAR -->
+        <div class="sidebar-mask" id="sidebarMask" onclick="toggleSidebar()"></div>
+        <aside class="sidebar" id="sidebar">
+            <div class="sb-brand">
+                <img src="logo.png" alt="GS Logo" onerror="this.style.display='none'">
+                <span class="brand-name" style="font-size:20px">GS Portal</span>
+            </div>
+            <div class="user-card">
+                <div class="u-avatar" id="uAvatar">U</div>
+                <div class="u-info">
+                    <div class="u-name" id="uName">Loading…</div>
+                    <div class="u-un" id="uUsername">@—</div>
+                    <div class="u-contact" id="uContact">—</div>
+                    <span class="role-pill" id="uRole">User</span>
                 </div>
             </div>
-
-            <div class="nav-bottom">
+            <div class="sb-bottom">
                 <button class="logout-btn" onclick="logout()">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
                     Secure Logout
                 </button>
-                <div class="creator-tag">App Created By Gobind Sharma</div>
+                <div class="creator">Built by Gobind Sharma</div>
             </div>
-        </div>
+        </aside>
 
-        <div class="main-arena" id="mainArena">
-            
-            <div class="desktop-back-nav" id="desktopBackBtn" onclick="closeApp()">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+        <!-- MAIN ARENA -->
+        <main class="main-arena" id="mainArena">
+            <div class="desk-back" id="deskBack" onclick="closeApp()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
                 Back to Dashboard
             </div>
 
-            <div id="dashboardContent">
-                <div id="adminSection" style="display: none;">
-                    <div class="section-title">System Administration</div>
-                    <div class="app-grid">
-                        
-                        <div class="app-card" onclick="openApp('admin-panel', 'apps/user-management/index.html', ['Full Access'], 'icon-purple', `<svg width='26' height='26' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2.5'><path d='M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2'></path><circle cx='9' cy='7' r='4'></circle><path d='M23 21v-2a4 4 0 0 0-3-3.87'></path><path d='M16 3.13a4 4 0 0 1 0 7.75'></path></svg>`, 'User Management')">
-                            <div class="app-icon icon-purple">
-                                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
-                            </div>
-                            <div class="app-details">
-                                <div class="app-name">User Management</div>
-                                <div class="app-desc">Create users, reset passwords, and configure system roles.</div>
-                            </div>
-                        </div>
-
-                    </div>
+            <div id="dashContent">
+                <!-- Admin tools -->
+                <div id="adminTools" style="display:none">
+                    <div class="section-label">System Administration</div>
+                    <div class="app-grid" id="adminGrid"></div>
                 </div>
-
-                <div class="section-title">Your Applications</div>
-                <div class="app-grid" id="appList"></div>
+                <div class="section-label">Your Applications</div>
+                <div class="app-grid" id="appGrid"></div>
             </div>
 
-            <iframe id="appViewer" src=""></iframe>
-        </div>
+            <iframe id="appViewer" src="" allow="clipboard-write"></iframe>
+        </main>
     </div>
+</div>
 
-    <button id="installAppBtn" class="install-fab">📲 Install App</button>
+<button class="install-fab" id="installFab">📲 Install App</button>
 
-    <script src="config.js"></script>
+<script src="config.js"></script>
+<script>
+// ── PWA install ──
+let deferredInstall;
+const fab = document.getElementById('installFab');
+window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); deferredInstall = e; fab.style.display = 'flex'; });
+fab.onclick = () => { fab.style.display = 'none'; deferredInstall.prompt(); deferredInstall = null; };
+if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').then(r => r.update());
 
-    <script>
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').then(reg => reg.update()));
+const API = GS_CONFIG.API_URL;
+
+// ── APP DIRECTORY ──
+const APPS = {
+    'tuition-manager': {
+        name: 'Tuition Manager',
+        desc: 'Manage students, attendance, fees, and exams with PDF receipts.',
+        ico: 'ic-blue',
+        path: 'apps/tuition-manager/index.html',
+        svg: `<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>`
+    },
+    'mcq-assessment': {
+        name: 'MCQ Quiz Maker',
+        desc: 'Create and deliver multiple-choice quizzes for Class 9 & 10.',
+        ico: 'ic-green',
+        path: 'apps/mcq-assessment/index.html',
+        svg: `<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>`
+    }
+};
+const ADMIN_APPS = {
+    'user-management': {
+        name: 'User Management',
+        desc: 'Create portal users, assign roles, reset passwords, and manage access.',
+        ico: 'ic-purple',
+        path: 'apps/user-management/index.html',
+        svg: `<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>`
+    }
+};
+
+// ── RENDER SIDEBAR ──
+function renderSidebar() {
+    const username = localStorage.getItem('gs_username') || '';
+    const role     = localStorage.getItem('gs_role')     || 'User';
+    const fullName = localStorage.getItem('gs_fullname') || username;
+    const email    = localStorage.getItem('gs_email')    || '';
+    const mobile   = localStorage.getItem('gs_mobile')   || '';
+    document.getElementById('uName').innerText    = fullName;
+    document.getElementById('uUsername').innerText = '@' + username;
+    document.getElementById('uContact').innerText  = [email, mobile].filter(Boolean).join(' · ') || '—';
+    document.getElementById('uAvatar').innerText   = fullName.charAt(0).toUpperCase();
+    const rolePill = document.getElementById('uRole');
+    rolePill.innerText = role;
+    if (role === 'Admin') rolePill.classList.add('admin');
+}
+
+// ── BUILD DASHBOARD ──
+function buildDashboard() {
+    const role = localStorage.getItem('gs_role') || 'User';
+    let access = {};
+    try { access = JSON.parse(localStorage.getItem('gs_access') || '{}'); } catch(e) {}
+
+    // Admin tools section
+    if (role === 'Admin') {
+        document.getElementById('adminTools').style.display = 'block';
+        const ag = document.getElementById('adminGrid');
+        ag.innerHTML = '';
+        Object.entries(ADMIN_APPS).forEach(([id, app]) => ag.appendChild(mkCard(id, app, ['Full Access'])));
+    }
+
+    // App grid
+    const grid = document.getElementById('appGrid');
+    grid.innerHTML = '';
+    if (role === 'Admin') {
+        Object.entries(APPS).forEach(([id, app]) => grid.appendChild(mkCard(id, app, ['All Access'])));
+    } else {
+        const allowed = Object.keys(access).filter(k => APPS[k]);
+        if (!allowed.length) {
+            grid.innerHTML = '<div style="color:#64748b;font-size:14px">No applications assigned to your account.</div>';
+        } else {
+            allowed.forEach(id => grid.appendChild(mkCard(id, APPS[id], access[id] || ['View'])));
         }
-        let deferredPrompt; const installBtn = document.getElementById('installAppBtn');
-        window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredPrompt = e; installBtn.style.display = 'flex'; });
-        installBtn.addEventListener('click', async () => { installBtn.style.display = 'none'; deferredPrompt.prompt(); deferredPrompt = null; });
+    }
+}
 
-        const API_URL = GS_CONFIG.API_URL;
+function mkCard(id, app, perms) {
+    const card = document.createElement('div');
+    card.className = 'app-card';
+    card.onclick = () => openApp(id, app);
+    card.innerHTML = `
+        <div class="app-ico ${app.ico}">${app.svg}</div>
+        <div class="app-det">
+            <div class="app-title">${app.name}</div>
+            <div class="app-desc">${app.desc}</div>
+            <div class="perm-tags">${perms.map(p => `<span class="perm-tag">${p}</span>`).join('')}</div>
+        </div>`;
+    return card;
+}
 
-        const APP_DIRECTORY = {
-            "tuition-manager": {
-                name: "Tuition Manager", desc: "Track student fees, manage logins, and generate PDF report cards.",
-                iconClass: "icon-blue", path: "apps/tuition-manager/index.html",
-                iconSVG: `<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>`
-            },
-            "mcq-assessment": {
-                name: "MCQ Quiz Maker", desc: "Class 9 & 10 Mathematics and Science examination delivery.",
-                iconClass: "icon-green", path: "apps/mcq-assessment/index.html",
-                iconSVG: `<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>`
-            }
-        };
+// ── OPEN / CLOSE APP ──
+let currentAppId = null;
+function openApp(id, app) {
+    currentAppId = id;
+    // Hide dashboard
+    document.getElementById('dashContent').style.display = 'none';
+    document.getElementById('deskBack').classList.add('visible');
+    // Mobile header swap
+    document.getElementById('topBarDash').style.display = 'none';
+    document.getElementById('topBarApp').style.display  = 'flex';
+    document.getElementById('curAppIcon').className = `cur-app-icon ${app.ico}`;
+    document.getElementById('curAppIcon').innerHTML = app.svg;
+    document.getElementById('curAppName').innerText = app.name;
+    // Close sidebar
+    document.getElementById('sidebar').classList.remove('open');
+    document.getElementById('sidebarMask').classList.remove('open');
+    // Iframe
+    const arena  = document.getElementById('mainArena');
+    const viewer = document.getElementById('appViewer');
+    arena.style.cssText  = 'padding:0;overflow:hidden;flex:1;display:flex;flex-direction:column';
+    viewer.style.display = 'block';
+    viewer.style.flex    = '1';
+    viewer.style.width   = '100%';
+    viewer.style.height  = '100%';
+    // On mobile we need explicit px height because some browsers ignore flex:1 on iframe
+    function setH() {
+        const barH = document.getElementById('topBar').offsetHeight || 0;
+        viewer.style.height = (window.innerHeight - barH) + 'px';
+    }
+    setH();
+    viewer.onload = () => {
+        try { viewer.contentWindow.postMessage({ action: 'fixBottomNav' }, '*'); } catch(e) {}
+    };
+    viewer.src = `${app.path}?ts=${Date.now()}`;
+}
 
-        window.onload = () => {
-            const token = localStorage.getItem('gs_token');
-            const username = localStorage.getItem('gs_username');
-            const role = localStorage.getItem('gs_role') || 'User';
-            
-            if (!token || !username) return window.location.href = 'index.html';
-            
-            renderSidebar(username);
-            buildDashboard();
-            
-            // Initiate silent background fetch for instant app loading
-            prefetchAppData(username, token, role);
-        };
+function closeApp() {
+    currentAppId = null;
+    const viewer = document.getElementById('appViewer');
+    viewer.src = '';
+    viewer.style.display = 'none';
+    document.getElementById('deskBack').classList.remove('visible');
+    document.getElementById('topBarDash').style.display = 'flex';
+    document.getElementById('topBarApp').style.display  = 'none';
+    const arena = document.getElementById('mainArena');
+    arena.style.cssText = '';
+    document.getElementById('dashContent').style.display = 'block';
+    // Silent refresh
+    prefetch();
+}
 
-        // ==========================================
-        // PREFETCH ENGINE (INSTANT LOAD)
-        // ==========================================
-        function prefetchAppData(username, token, role) {
-            // Prefetch Students
-            fetch(API_URL, {
-                method: 'POST',
-                body: JSON.stringify({ action: 'get_students', username: username, token: token })
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.status === 'success') sessionStorage.setItem('gs_pref_students', JSON.stringify(data.students));
-            }).catch(e => console.error("Prefetch error"));
+window.addEventListener('resize', () => {
+    const viewer = document.getElementById('appViewer');
+    if (viewer.style.display !== 'none') {
+        const barH = document.getElementById('topBar').offsetHeight || 0;
+        viewer.style.height = (window.innerHeight - barH) + 'px';
+    }
+});
 
-            // Prefetch Users (Only Admins need this)
-            if (role === 'Admin') {
-                fetch(API_URL, {
-                    method: 'POST',
-                    body: JSON.stringify({ action: 'get_users', adminUsername: username, adminToken: token })
-                })
-                .then(res => res.json())
-                .then(data => {
-                    if (data.status === 'success') sessionStorage.setItem('gs_pref_users', JSON.stringify(data.users));
-                }).catch(e => console.error("Prefetch error"));
-            }
-        }
+// Listen for cache refresh requests from iframe apps
+window.addEventListener('message', e => {
+    if (e.data?.action === 'refreshCache') prefetch();
+});
 
-        function toggleSidebar() {
-            document.getElementById('sidebar').classList.toggle('active');
-            document.getElementById('sidebarOverlay').classList.toggle('active');
-        }
+// ── SIDEBAR TOGGLE ──
+function toggleSidebar() {
+    document.getElementById('sidebar').classList.toggle('open');
+    document.getElementById('sidebarMask').classList.toggle('open');
+}
 
-        function renderSidebar(username) {
-            const role = localStorage.getItem('gs_role') || 'User';
-            
-            // Fetch Full Name, Email, and Mobile from localStorage
-            const fullName = localStorage.getItem('gs_fullname') || username;
-            const email = localStorage.getItem('gs_email') || 'No Email provided';
-            const mobile = localStorage.getItem('gs_mobile') || 'No Mobile provided';
+// ── PREFETCH (background data warm-up) ──
+function prefetch() {
+    const u = localStorage.getItem('gs_username');
+    const t = localStorage.getItem('gs_token');
+    const r = localStorage.getItem('gs_role');
+    if (!u || !t) return;
+    fetch(API, { method: 'POST', body: JSON.stringify({ action: 'get_students', username: u, token: t }) })
+        .then(r => r.json()).then(d => { if (d.status === 'success') sessionStorage.setItem('gs_pref_students', JSON.stringify(d.students)); })
+        .catch(() => {});
+    if (r === 'Admin') {
+        fetch(API, { method: 'POST', body: JSON.stringify({ action: 'get_users', adminUsername: u, adminToken: t }) })
+            .then(r => r.json()).then(d => { if (d.status === 'success') sessionStorage.setItem('gs_pref_users', JSON.stringify(d.users)); })
+            .catch(() => {});
+    }
+}
 
-            document.getElementById('displayFullName').innerText = fullName;
-            document.getElementById('displayUsername').innerText = '@' + username;
-            document.getElementById('displayContact').innerText = `${email} • ${mobile}`;
-            document.getElementById('userInitials').innerText = fullName.charAt(0).toUpperCase();
+// ── LOGOUT ──
+function logout() { localStorage.clear(); sessionStorage.clear(); window.location.href = 'index.html'; }
 
-            const roleBadge = document.getElementById('displayRole');
-            roleBadge.innerText = role;
-            if (role === 'Admin') { roleBadge.classList.add('role-admin'); document.getElementById('adminSection').style.display = 'block'; }
-        }
-
-        function buildDashboard() {
-            const role = localStorage.getItem('gs_role');
-            let accessData = {};
-            try { accessData = JSON.parse(localStorage.getItem('gs_access')) || {}; } catch (e) {}
-
-            const appListContainer = document.getElementById('appList');
-            appListContainer.innerHTML = ''; 
-
-            if (role === 'Admin') {
-                Object.keys(APP_DIRECTORY).forEach(appId => appListContainer.appendChild(createAppCard(appId, ["All Access"])));
-                return;
-            }
-
-            const allowedApps = Object.keys(accessData);
-            if (allowedApps.length === 0) {
-                appListContainer.innerHTML = '<div style="color: #94a3b8; font-size: 14px;">No applications assigned.</div>';
-                return;
-            }
-            allowedApps.forEach(appId => { if (APP_DIRECTORY[appId]) appListContainer.appendChild(createAppCard(appId, accessData[appId])); });
-        }
-
-        function createAppCard(appId, permissionsArr) {
-            const app = APP_DIRECTORY[appId];
-            const card = document.createElement('div');
-            card.className = 'app-card';
-            card.onclick = () => openApp(appId, app.path, permissionsArr, app.iconClass, app.iconSVG, app.name);
-
-            const tagsHTML = permissionsArr.map(p => `<div class="perm-tag">${p}</div>`).join('');
-            card.innerHTML = `
-                <div class="app-icon ${app.iconClass}">${app.iconSVG}</div>
-                <div class="app-details">
-                    <div class="app-name">${app.name}</div>
-                    <div class="app-desc">${app.desc}</div>
-                    <div class="permission-tags">${tagsHTML}</div>
-                </div>
-            `;
-            return card;
-        }
-
-        function openApp(appId, path, permissions, iconClass, iconSVG, appName) {
-            document.getElementById('dashboardContent').style.display = 'none';
-            document.getElementById('desktopBackBtn').classList.add('active');
-            
-            document.getElementById('headerDashboard').style.display = 'none';
-            const headerApp = document.getElementById('headerApp');
-            headerApp.style.display = 'flex';
-            
-            const iconContainer = document.getElementById('headerAppIcon');
-            iconContainer.className = `current-app-icon ${iconClass}`;
-            iconContainer.innerHTML = iconSVG;
-            document.getElementById('headerAppName').innerText = appName;
-
-            // STRICT SCROLL LOCK: Prevent dashboard from pushing iframe out of bounds
-            const mainArena = document.getElementById('mainArena');
-            mainArena.style.padding = '0';
-            mainArena.style.gap = '0';
-            mainArena.style.overflow = 'hidden'; 
-
-            document.getElementById('sidebar').classList.remove('active');
-            document.getElementById('sidebarOverlay').classList.remove('active');
-
-            const viewer = document.getElementById('appViewer');
-            viewer.onload = () => {
-                try { viewer.contentWindow.postMessage({ action: 'fixBottomNav' }, '*'); } catch (e) {}
-            };
-
-            viewer.style.height = (window.innerHeight - document.querySelector('.mobile-header').offsetHeight) + 'px';
-            viewer.src = `${path}?perms=${encodeURIComponent(JSON.stringify(permissions))}`;
-            viewer.style.display = 'block';
-        }
-
-        window.addEventListener('resize', () => {
-            const viewer = document.getElementById('appViewer');
-            if (viewer.style.display === 'block') {
-                viewer.style.height = (window.innerHeight - document.querySelector('.mobile-header').offsetHeight) + 'px';
-                try { viewer.contentWindow.postMessage({ action: 'fixBottomNav' }, '*'); } catch(e){}
-            }
-        });
-
-        function closeApp() {
-            document.getElementById('appViewer').src = '';
-            document.getElementById('appViewer').style.display = 'none';
-            
-            document.getElementById('desktopBackBtn').classList.remove('active');
-            
-            document.getElementById('headerApp').style.display = 'none';
-            document.getElementById('headerDashboard').style.display = 'flex';
-            
-            // RESTORE SCROLL
-            const mainArena = document.getElementById('mainArena');
-            mainArena.style.padding = '15px';
-            mainArena.style.gap = '20px';
-            mainArena.style.overflow = 'auto'; 
-            
-            document.getElementById('dashboardContent').style.display = 'flex';
-
-            // NEW: Silent Focus Refresh
-            // Automatically grab fresh data every time they return to the dashboard
-            const username = localStorage.getItem('gs_username');
-            const token = localStorage.getItem('gs_token');
-            const role = localStorage.getItem('gs_role');
-            prefetchAppData(username, token, role);
-        }
-
-        // NEW: Cross-Window Event Listener
-        // Listens for a signal from the iframe apps to refresh the cache instantly
-        window.addEventListener('message', (event) => {
-            if (event.data && event.data.action === 'refreshCache') {
-                console.log("Background cache refresh triggered by app...");
-                const username = localStorage.getItem('gs_username');
-                const token = localStorage.getItem('gs_token');
-                const role = localStorage.getItem('gs_role');
-                prefetchAppData(username, token, role);
-            }
-        });
-
-        function logout() { localStorage.clear(); window.location.href = 'index.html'; }
-    </script>
+// ── INIT ──
+window.onload = () => {
+    const token    = localStorage.getItem('gs_token');
+    const username = localStorage.getItem('gs_username');
+    if (!token || !username) { window.location.href = 'index.html'; return; }
+    renderSidebar();
+    buildDashboard();
+    prefetch();
+};
+</script>
 </body>
 </html>
